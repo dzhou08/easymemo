@@ -20,6 +20,7 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'env_config.dart';
 
 Future main() async {
   // To load the .env file contents into dotenv.
@@ -32,13 +33,13 @@ Future main() async {
     if (kIsWeb) {
       await Firebase.initializeApp(
         options: FirebaseOptions(
-            apiKey: 'AIzaSyB7PEoQFwaEpMQdi1WHWb_qGDb-cJ4KyCY',
-            appId: '1:51903881089:web:1722aecace84d1d6089280',
-            messagingSenderId: '51903881089',
-            projectId: 'alzheimer-app-a6022',
-            authDomain: 'alzheimer-app-a6022.firebaseapp.com',
-            storageBucket: 'alzheimer-app-a6022.appspot.com',
-            measurementId: 'G-8ZDLS3VWF2',
+            apiKey: EnvConfig.firebaseApiKeyWeb,
+            appId: EnvConfig.firebaseAppIdWeb,
+            messagingSenderId: EnvConfig.firebaseMessagingSenderId,
+            projectId: EnvConfig.firebaseProjectId,
+            authDomain: EnvConfig.firebaseAuthDomain,
+            storageBucket: EnvConfig.firebaseStorageBucket,
+            measurementId: EnvConfig.firebaseMeasurementId,
         ),
       );
     } else {

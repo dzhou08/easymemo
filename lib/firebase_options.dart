@@ -4,6 +4,8 @@ import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
 /// Example:
@@ -15,7 +17,9 @@ import 'package:flutter/foundation.dart'
 /// );
 /// ```
 class DefaultFirebaseOptions {
+
   static FirebaseOptions get currentPlatform {
+    
     if (kIsWeb) {
       return web;
     }
@@ -40,7 +44,19 @@ class DefaultFirebaseOptions {
     }
   }
 
+  dotenv.load{fileName: ".env"};
+  
   static const FirebaseOptions web = FirebaseOptions(
+
+
+    apiKey: dotenv.env['FIREBASE_API_KEY'].toString(),
+            appId: dotenv.env['FIREBASE_APP_ID'].toString(),
+            messagingSenderId: dotenv.env['FIREBASE_MESSAGE_SENDER_ID'].toString(),
+            projectId: dotenv.env['FIREBASE_PROJECT_ID'].toString(),
+            authDomain: '${dotenv.env['FIREBASE_PROJECT_ID']}.firebaseapp.com',
+            storageBucket: '${dotenv.env['FIREBASE_PROJECT_ID']}.appspot.com',
+            measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID'].toString(),
+
     apiKey: 'AIzaSyB7PEoQFwaEpMQdi1WHWb_qGDb-cJ4KyCY',
     appId: '1:51903881089:web:1722aecace84d1d6089280',
     messagingSenderId: '51903881089',
