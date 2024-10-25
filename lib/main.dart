@@ -3,8 +3,9 @@
 import 'package:flutter/material.dart';
 //import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
-import 'home_task_checkbox_list.dart';
-import 'home_date_display.dart';
+//import 'home_task_checkbox_list.dart';
+//import 'home_date_display.dart';
+import 'home_calendar_page.dart';
 import 'auth_provider.dart';
 
 import 'my_app_state.dart';
@@ -140,42 +141,6 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class GeneratorPage extends StatelessWidget {
-  const GeneratorPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    var colorScheme = Theme.of(context).colorScheme;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('EasyMemo'),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          DateDisplay(),
-          SizedBox(height: 10),
-          VerticalDivider(
-              color: Colors.black,
-              thickness: 4,
-            ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  TaskCheckList(),
-                  // More widgets that cause overflow
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),    
-    );
-  }
-}
-
 class _MyHomePageState extends State<MyHomePage> {
 
   final bool _initialized = true; // Firebase is already initialized in main()
@@ -207,7 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page = GeneratorPage();
+        page = CalendarPage();
         break;
       case 1:
         page = StepperPage();

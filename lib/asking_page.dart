@@ -17,7 +17,8 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 //import 'home_speaker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'dart:io' as Io;
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 
 
@@ -47,15 +48,15 @@ class _AskingPageState extends State<AskingPage> {
   // LabelText that will be updated
   String inputLabelText = "Enter your prompt";
 
-  File? _image;
+  Io.File? _image;
 
   // Function to pick an image
   Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
       setState(() {
-        _image = File(pickedImage.path);
+        _image = Io.File(pickedImage.path);
       });
     }
   }
@@ -91,7 +92,9 @@ class _AskingPageState extends State<AskingPage> {
       _speech.listen(onResult: (val) {
         setState(() {
           _voiceInput = val.recognizedWords;
-          _controller.text = _voiceInput;  // Populate the text field with voice input
+          _controller.text = _voiceInput; // Populate the text field with voice input
+          // reset
+          _voiceInput='';
         });
       });
     }
@@ -193,7 +196,6 @@ class _AskingPageState extends State<AskingPage> {
     return null;
   }
 
-
   Future<void> sendToGPT(String message) async {
     if (!mounted) return; // Check if mounted before setting state
     setState(() {
@@ -207,37 +209,109 @@ class _AskingPageState extends State<AskingPage> {
       enableLog: true
     );
     
-    final request_2 = ChatCompleteText(
-      messages: [
-        Map.of({"role": "system", "content": "You are a helpful assistant that responds in image analysis."}),
-        Map.of({"role": "user", "content": [
-              {"type": "text", "text": "Help me answer the following message question based on fileContent value."},
-              {
-                "type": "text", 
-                "text": _fileContent
-              },
-              {
-                "type": "text", 
-                "text": message
-              },
-          ]})
-      ], 
-      maxToken: 200, 
-      model: Gpt4OChatModel(),
-      temperature: 0.0,
-    );
+    if (_image != null && (Io.Platform.isAndroid || Io.Platform.isIOS))
+    {
+      print("with picture");
+      try {
+        // Step 1: compress file first
+        final compressedImage = await FlutterImageCompress.compressAndGetFile(
+          _image!.absolute.path,
+          "${_image!.path}_compressed.jpg",
+          quality: 70, // Adjust the quality (0-100) to control compression
+        );
+        if (compressedImage == null) {
+          throw Exception('Image compression failed');
+        }
+        // Step 2: Read the compressed image and encode it as a base64 string
+        final bytes = Io.File(compressedImage.path).readAsBytesSync();
+        String base64Image = base64Encode(bytes);
 
-    final response = await openAI.onChatCompletion(request: request_2);
-    // Get the text response from GPT
-    String answer = response?.choices[0].message?.content.trim() ?? 'No response';
+        // Step 3: Construct the image analysis instruction
+        String imageAnalysisInstruction = """
+                  Help me to analyze the image file for an ALzheimer patient or an eldly person. 
+                  Explain what is shown in the image with details;
+                  If the image contains an object like ATM machine etc, include detailed instruction on how they can interact with the object;
+                  """;
 
-    if (mounted) {
-      setState(() {
+        // Step 4: Create a ChatCompleteText request for OpenAI
+        final requestImage = ChatCompleteText(
+          messages: [
+            {"role": "system", "content": "You are a helpful companion for an Alzheimer's patient. Patiently explain details."},
+            {
+              "role": "user",
+              "content": [
+                {"type": "text", "text": imageAnalysisInstruction},
+                {"type": "image_url", "image_url": {"url": "data:image/png;base64,$base64Image"}}
+              ]
+            }
+          ],
+          maxToken: 200,
+          model: Gpt4OChatModel(), // Assuming you're using GPT-4 model
+          temperature: 0.0, // Adjust as needed
+        );
 
-        messages.add({'assistant': answer});
-        inputLabelText='Enter your message';
-        _isLoading = false;
-      });
+        // Step 5: Send the request to OpenAI and process the response
+        final response = await openAI.onChatCompletion(request: requestImage);
+
+        // Step 6: Output the response
+        if (response != null) {
+
+          // Get the text response from GPT
+          String answer = response.choices[0].message?.content.trim() ?? 'No response';
+
+          if (mounted) {
+            setState(() {
+
+              messages.add({'assistant': answer});
+              inputLabelText='Enter your message';
+              _isLoading = false;
+              _controller.clear();
+              
+
+            });
+          }
+        } else {
+          print("No valid response received.");
+        }
+      } catch (e) {
+      // Handle any exceptions that may occur during the process
+      print("Error occurred: $e");
+    }
+    }
+    else
+    {
+        final requestText = ChatCompleteText(
+        messages: [
+          Map.of({"role": "system", "content": "You are a helpful assistant that responds in image analysis."}),
+          Map.of({"role": "user", "content": [
+                {"type": "text", "text": "Help me answer the following message question based on fileContent value."},
+                {
+                  "type": "text", 
+                  "text": _fileContent
+                },
+                {
+                  "type": "text", 
+                  "text": message
+                },
+            ]})
+        ], 
+        maxToken: 200, 
+        model: Gpt4OChatModel(),
+        temperature: 0.0,
+      );
+
+      final response = await openAI.onChatCompletion(request: requestText);
+      // Get the text response from GPT
+      String answer = response?.choices[0].message?.content.trim() ?? 'No response';
+
+      if (mounted) {
+        setState(() {
+
+          messages.add({'assistant': answer});
+          inputLabelText='Enter your message';
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -245,6 +319,14 @@ class _AskingPageState extends State<AskingPage> {
   void _clearMessages() {
     setState(() {
       messages.clear();
+    });
+  }
+
+  // Function to clear the messages list
+  void _clearQuestion() {
+    setState(() {
+      _controller.text='';
+      _controller.clear();
     });
   }
 
@@ -270,14 +352,21 @@ class _AskingPageState extends State<AskingPage> {
                 final message = messages[index];
                 print(message);
                 // Display either user or assistant message
-                return ListTile(
-                  title: Row(
+                return SingleChildScrollView(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (message.containsKey('user')) 
-                        const Icon(Icons.person),  // Replace "Assistant:" with an icon
+                        const Icon(
+                          Icons.person, 
+                          color: Colors.purple
+                        ),  // Replace "Assistant:" with an icon
                       
                       if (message.containsKey('assistant')) 
-                        const Icon(Icons.smart_toy),
+                        const Icon(
+                          Icons.smart_toy,
+                          color: Colors.purple,
+                        ),
                       const SizedBox(width: 8), // Add some spacing between the icon and the text
                       
                       Expanded(
@@ -301,10 +390,22 @@ class _AskingPageState extends State<AskingPage> {
           // Clear Messages Button
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: _clearMessages,  // Call the clear function
-              child: const Text('Clear Messages'),
-            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min, // Makes the button width fit the content
+              mainAxisAlignment: MainAxisAlignment.center, // Center-aligns the icon and text
+                
+              children: [
+                ElevatedButton(
+                  onPressed: _clearMessages,  // Call the clear function to clear messages
+                  child: const Text('Clear Messages'),
+                ),
+                const SizedBox(width: 15),
+                ElevatedButton(
+                  onPressed: _clearQuestion,  // Call the clear function to clear question
+                  child: const Text('Clear Question'),
+                ),
+              ]
+            )
           ),
           // Display selected image with a delete button (if any)
           if (_image != null)
@@ -314,8 +415,8 @@ class _AskingPageState extends State<AskingPage> {
                 children: [
                   // Image display
                   Container(
-                    height: 200,
-                    width: 200,
+                    height: 150,
+                    width: 150,
                     decoration: BoxDecoration(
                       border: Border.all(),
                     ),
@@ -326,7 +427,7 @@ class _AskingPageState extends State<AskingPage> {
                     right: 0,
                     top: 0,
                     child: IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
+                      icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: _removeImage, // Call the function to remove the image
                     ),
                   ),
@@ -344,7 +445,7 @@ class _AskingPageState extends State<AskingPage> {
                   mainAxisSize: MainAxisSize.min, // Adjusts the Row's width
                   children: [
                     IconButton(
-                      icon: Icon(Icons.camera_alt),
+                      icon: const Icon(Icons.camera_alt),
                       onPressed: _pickImage, // Trigger image picker
                     ),
                     IconButton(
@@ -356,8 +457,8 @@ class _AskingPageState extends State<AskingPage> {
               ),
               onSubmitted: (value) {
                 if (value.isNotEmpty) {
+                  _controller.text='';
                   sendToGPT(value);
-                  _controller.clear();
                 }
               },
             ),

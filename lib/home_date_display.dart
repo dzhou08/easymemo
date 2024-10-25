@@ -42,6 +42,7 @@ class _DateDisplayState extends State<DateDisplay> {
   Widget build(BuildContext context) {
 
     var now = DateTime.now();  
+    now = now.subtract(Duration(days: 7));
     var morningAfternoon = now.hour < 12 ? "Morning" : now.hour < 16? "Afternoon": "Evening";
     var dateWeek = DateFormat('EEEEE', 'en_US').format(now);
     var hourMin = DateFormat("h:mm a", "en_US").format(now);

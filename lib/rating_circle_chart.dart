@@ -5,7 +5,7 @@ class RatingCircleChart extends StatelessWidget {
   final double currentRating; // Current rating value
   final double maxRating; // Maximum rating value
 
-  const RatingCircleChart({required this.currentRating, required this.maxRating});
+  const RatingCircleChart({super.key, required this.currentRating, required this.maxRating});
 
   @override
   Widget build(BuildContext context) {

@@ -40,6 +40,9 @@ dependencies:
   percent_indicator: ^4.2.3
   flutter_svg: ^2.0.10+1
   image_picker: ^1.1.2
+  flutter_image_compress: ^2.3.0
+  flutter_launcher_icons: ^0.14.1
+  flutter_html: ^3.0.0-beta.2
 
 
   english_words: ^4.0.0
@@ -59,3 +62,9 @@ flutter:
     - assets/images/
     - assets/icons/
     - .env
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/EasyMemo_logo.png"
+  appname: "EasyMemo"

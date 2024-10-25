@@ -6,6 +6,7 @@ class GAuthProvider with ChangeNotifier {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: [
       'https://www.googleapis.com/auth/spreadsheets.readonly',
+      'https://www.googleapis.com/auth/calendar.readonly',
       'https://www.googleapis.com/auth/drive.readonly',
       'email',
     ],

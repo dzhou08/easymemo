@@ -4,7 +4,8 @@ import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'env_config.dart';
+
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -43,64 +44,52 @@ class DefaultFirebaseOptions {
         );
     }
   }
-
-  dotenv.load{fileName: ".env"};
   
-  static const FirebaseOptions web = FirebaseOptions(
-
-
-    apiKey: dotenv.env['FIREBASE_API_KEY'].toString(),
-            appId: dotenv.env['FIREBASE_APP_ID'].toString(),
-            messagingSenderId: dotenv.env['FIREBASE_MESSAGE_SENDER_ID'].toString(),
-            projectId: dotenv.env['FIREBASE_PROJECT_ID'].toString(),
-            authDomain: '${dotenv.env['FIREBASE_PROJECT_ID']}.firebaseapp.com',
-            storageBucket: '${dotenv.env['FIREBASE_PROJECT_ID']}.appspot.com',
-            measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID'].toString(),
-
-    apiKey: 'AIzaSyB7PEoQFwaEpMQdi1WHWb_qGDb-cJ4KyCY',
-    appId: '1:51903881089:web:1722aecace84d1d6089280',
-    messagingSenderId: '51903881089',
-    projectId: 'alzheimer-app-a6022',
-    authDomain: 'alzheimer-app-a6022.firebaseapp.com',
-    storageBucket: 'alzheimer-app-a6022.appspot.com',
-    measurementId: 'G-8ZDLS3VWF2',
+  static final FirebaseOptions web = FirebaseOptions(
+    apiKey: EnvConfig.firebaseApiKeyWeb,
+    appId: EnvConfig.firebaseAppIdWeb,
+    messagingSenderId: EnvConfig.firebaseMessagingSenderId,
+    projectId: EnvConfig.firebaseProjectId,
+    authDomain: EnvConfig.firebaseAuthDomain,
+    storageBucket: EnvConfig.firebaseStorageBucket,
+    measurementId: EnvConfig.firebaseMeasurementId,
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCe79XcrQgySVq9pwQyBX5Mc76i2AyiVWE',
-    appId: '1:51903881089:android:b6c3c98a99d53ae5089280',
-    messagingSenderId: '51903881089',
-    projectId: 'alzheimer-app-a6022',
-    storageBucket: 'alzheimer-app-a6022.appspot.com',
+  static final FirebaseOptions android = FirebaseOptions(
+    apiKey: EnvConfig.firebaseApiKeyAndroid,
+    appId: EnvConfig.firebaseAppIdAndroid,
+    messagingSenderId: EnvConfig.firebaseMessagingSenderId,
+    projectId: EnvConfig.firebaseProjectId,
+    storageBucket: EnvConfig.firebaseStorageBucket,
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCuG4jrgr-aKswJyYehY_zXWxOTRn9S6vQ',
-    appId: '1:51903881089:ios:6684c271f572ce57089280',
-    messagingSenderId: '51903881089',
-    projectId: 'alzheimer-app-a6022',
-    storageBucket: 'alzheimer-app-a6022.appspot.com',
-    iosClientId: '51903881089-q6pqf1pq4nc9hfgtmm0jlv9f65hjadge.apps.googleusercontent.com',
-    iosBundleId: 'com.example.alzheimerApp',
+  static final FirebaseOptions ios = FirebaseOptions(
+    apiKey: EnvConfig.firebaseApiKeyIos,
+    appId: EnvConfig.firebaseAppIdIos,
+    messagingSenderId: EnvConfig.firebaseMessagingSenderId,
+    projectId: EnvConfig.firebaseProjectId,
+    storageBucket: EnvConfig.firebaseStorageBucket,
+    iosClientId: EnvConfig.firebaseIosClientId,
+    iosBundleId: EnvConfig.firebaseIosBundleId,
   );
 
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCuG4jrgr-aKswJyYehY_zXWxOTRn9S6vQ',
-    appId: '1:51903881089:ios:6684c271f572ce57089280',
-    messagingSenderId: '51903881089',
-    projectId: 'alzheimer-app-a6022',
-    storageBucket: 'alzheimer-app-a6022.appspot.com',
-    iosClientId: '51903881089-q6pqf1pq4nc9hfgtmm0jlv9f65hjadge.apps.googleusercontent.com',
-    iosBundleId: 'com.example.alzheimerApp',
+  static final FirebaseOptions macos = FirebaseOptions(
+    apiKey: EnvConfig.firebaseApiKeyMacOS,
+    appId: EnvConfig.firebaseAppIdMacOS,
+    messagingSenderId: EnvConfig.firebaseMessagingSenderId,
+    projectId: EnvConfig.firebaseProjectId,
+    storageBucket: EnvConfig.firebaseStorageBucket,
+    iosClientId: EnvConfig.firebaseIosClientId,
+    iosBundleId: EnvConfig.firebaseIosBundleId,
   );
 
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyB7PEoQFwaEpMQdi1WHWb_qGDb-cJ4KyCY',
-    appId: '1:51903881089:web:aba1099e3312e520089280',
-    messagingSenderId: '51903881089',
-    projectId: 'alzheimer-app-a6022',
-    authDomain: 'alzheimer-app-a6022.firebaseapp.com',
-    storageBucket: 'alzheimer-app-a6022.appspot.com',
-    measurementId: 'G-2EWPXQ55W6',
+  static final FirebaseOptions windows = FirebaseOptions(
+    apiKey: EnvConfig.firebaseApiKeyWindows,
+    appId: EnvConfig.firebaseAppIdWindows,
+    messagingSenderId: EnvConfig.firebaseMessagingSenderId,
+    projectId: EnvConfig.firebaseProjectId,
+    authDomain: EnvConfig.firebaseAuthDomain,
+    storageBucket: EnvConfig.firebaseStorageBucket,
+    measurementId: EnvConfig.firebaseMeasurementId,
   );
 }
