@@ -255,11 +255,11 @@ class _StepperPageState extends State<StepperPage> {
     // Define a list of strings
     final List<Set<String>> threeWords = [
       {'banana', 'sunrise', 'chair'}, 
-      /*{'leader', 'season', 'table'},
+      {'leader', 'season', 'table'},
       {'village', 'kitchen', 'baby'},
       {'river', 'nation', 'finger'}, 
       {'captain', 'garden', 'picture'}, 
-      {'daughter', 'heaven', 'mountain'}*/
+      {'daughter', 'heaven', 'mountain'}
     ];
 
     // Create a random number generator

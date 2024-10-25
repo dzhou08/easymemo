@@ -1,16 +1,17 @@
-# easymemo
+# EasyMemo
 
-an mobile help to help Ahzheimer patients
+an mobile help serves as AI Companion for Alzheimer's early detection and daily helper.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+EasyMemo was built on Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
+For more resources on Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+## Presentations
+
+- [Presentation slides](https://docs.google.com/presentation/d/1vucwYp45FQGLbQEKPhv-L5gC6QeYHfbWweIfPMEwPD0/edit?usp=sharing)
+- [YouTube video](https://youtu.be/zgzGsh_Z6CE?si=Ret3MNocz6YBS_K-)
+
