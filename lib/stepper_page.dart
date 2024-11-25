@@ -1,11 +1,13 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_drawing_board/paint_contents.dart';
 
 import 'dart:io' as Io;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -14,6 +16,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 
 import 'package:flutter_html/flutter_html.dart';
+import 'package:path_provider/path_provider.dart';
+
+import 'package:provider/provider.dart';
+import 'auth_provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+
 
 
 //import 'package:http/http.dart' as http;
@@ -22,8 +31,13 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 //import 'package:enhance_stepper/enhance_stepper.dart';
 import 'rating_circle_chart.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
-
+import 'package:googleapis/drive/v3.dart';
+import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
+import 'package:googleapis_auth/googleapis_auth.dart' as auth show AuthClient;
+import 'package:http/http.dart';
 
 
 class StepperPage extends StatefulWidget {
@@ -35,6 +49,7 @@ class StepperPage extends StatefulWidget {
 }
 
 class _StepperPageState extends State<StepperPage> {
+  static GlobalKey resultContainer = GlobalKey();
 
   String? _imageFilePath;
     
@@ -53,6 +68,9 @@ class _StepperPageState extends State<StepperPage> {
   // the ratings of clock drawing
   int _clockDrawingPoints=0;
   String _clockDrawingFeedback="";
+
+  String? _googleAccessToken;
+  late Client _httpClient;
 
   late DrawingController _drawingController;
 
@@ -76,6 +94,9 @@ class _StepperPageState extends State<StepperPage> {
   Future<void> _initAsync() async {
     // Initialize the image path asynchronously
     await _initializeImagePath();
+    final authProvider = Provider.of<GAuthProvider>(context, listen: false);
+    _googleAccessToken = authProvider.getAccessToken();
+    _httpClient = authProvider.getAuthClient();
   }
   @override
   void initState() {
@@ -137,6 +158,121 @@ class _StepperPageState extends State<StepperPage> {
     });
   }
 
+  // Function to search files by name
+  Future<String?> _getGoogleFolderByName(String accessToken, String folderName) async {
+    // the return value of folderId
+    String? folderId;
+
+    print("in google folder  $accessToken");
+    // Google Drive API search query to search for a folder by name
+    final query = "name contains '$folderName'";
+    print(query);
+    try
+    {
+      var driveApi = DriveApi(_httpClient);
+      // List files in the specified folder
+      final fileList = await driveApi.files.list(
+        q: query,
+        $fields: 'files(id, name)',
+      );
+
+      // Loop through and print file details
+      for (var file in fileList.files ?? []) {
+        print('File ID: ${file.id}, Name: ${file.name}, MIME type: ${file.mimeType}');
+        folderId = file.id;
+        break;
+      }
+    }
+    catch (e)
+    {
+      print('error finding google folder $e');
+    }
+    return folderId;
+  }
+
+  Future<void> sendReport() async{
+    try {
+      // Create a PDF document
+      final pdf = pw.Document();
+      pw.MemoryImage? imagePdf;
+      if (_imageFilePath != null && Io.File(_imageFilePath!).existsSync()) {
+        final pngBytes = await Io.File(_imageFilePath!).readAsBytes(); // Read file bytes
+        imagePdf = pw.MemoryImage(pngBytes); // Create a MemoryImage
+      } else {
+        print("Image file does not exist or the path is null");
+      }
+
+      var now = DateTime.now();
+      var hourMin = DateFormat("h:mm a", "en_US").format(now);
+      var yearDay = DateFormat("MMM dd, yyyy", "en_US").format(now);
+      var timestampFileName = DateFormat("yyyyMMddhmma", "en_US").format(now);
+
+      pdf.addPage(
+        pw.Page(
+          build: (pw.Context context) => pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text('$yearDay $hourMin'),
+              pw.Text('Your Mini-Cog diagnose results are listed below:'),
+              pw.Divider(
+                thickness: 4,
+                color: PdfColors.deepPurple,
+              ),
+              pw.Text('Word Recall'),
+              pw.Text("The original three words are: ${_threeWordsInitSet.join(', ')}"),
+              pw.Text("You said:${_threeWordsRepeatSet.join(', ')}"),
+              pw.Text("Your score is: $_wordRecallPoints out of 3."),
+              pw.Divider(
+                thickness: 4,
+                color: PdfColors.deepPurple,
+              ),
+              pw.Text("Clock Draw Points: $_clockDrawingPoints out of 2"),
+              pw.Image(
+                imagePdf!,
+                width: 400, // Set the desired width
+                height: 200, // Set the desired height
+              fit: pw.BoxFit.contain, ),
+              pw.Text("Clock Draw feedback:"),
+              pw.Text(_clockDrawingFeedback),
+              pw.Divider(
+                thickness: 4,
+                color: PdfColors.deepPurple,
+              ),
+              pw.Text("Total score: ${_wordRecallPoints+_clockDrawingPoints}"),
+            ]
+          )
+        )
+      );
+
+      // Save the PDF to a file
+      final appDir = await getTemporaryDirectory();
+      final pdfFile = Io.File('${appDir.path}/output.pdf');
+      await pdfFile.writeAsBytes(await pdf.save());
+      print('PDF created');
+
+
+      // get local path
+      final driveFolderId = await _getGoogleFolderByName(_googleAccessToken.toString(), 'minicog_reports_folder');
+      print(driveFolderId);
+      
+      var driveApi = DriveApi(_httpClient);
+      final fileToUpload = File()
+      ..name = 'MiniCog_report_${timestampFileName}.pdf'
+      ..parents = [driveFolderId!];
+
+      final uploadResponse = await driveApi.files.create(
+        fileToUpload,
+        uploadMedia: Media(pdfFile.openRead(), pdfFile.lengthSync()),
+      );
+
+      print('File uploaded successfully! File ID: ${uploadResponse.id}');
+    }
+    catch (e)
+    {
+      print('error finding google folder $e');
+    }
+  }
+
   // Function to draw a circle
   void _drawCircle() {
     // Define the circle properties
@@ -187,10 +323,6 @@ class _StepperPageState extends State<StepperPage> {
   String chatGPTResponse = "";
 
   Future<void> openAICalling(String path) async {
-    // print(dotenv.env['OPENAI_API_KEY']);
-
-    //String path = "/Users/zqian/Library/Containers/com.example.adApp/Data/Documents/FlutterLetsDraw.png";
-
     // Open the image file and encode it as a base64 string
     final bytes = Io.File(path).readAsBytesSync();
 
@@ -281,25 +413,15 @@ class _StepperPageState extends State<StepperPage> {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-            const Text('Your Mini-Cog™ diagnose results are listed below:'),
-            Card(
-              
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
+              const Text('Your Mini-Cog™ diagnose results are listed below:'),
+              Card(
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
                       Html(
-                        data: "<span style='color: purple;'><b>Word Recall:</b></span>",
-                      ),
-                      Html(
-                        data: "The original three words are: <br/> <b>${_threeWordsInitSet.join(', ')}</b>",
-                      ),
-                      Html(
-                        data: "You said: <br/> <b>${_threeWordsRepeatSet.join(', ')}</b>",
-                      ),
-                      Html(
-                        data: "Your score is: <br/> <b> $_wordRecallPoints out of 3.</b>",
+                        data: "<span style='color: purple;'><b>Word Recall:</b></span><br/>The original three words are: <br/> <b>${_threeWordsInitSet.join(', ')}</b><br/>You said: <br/> <b>${_threeWordsRepeatSet.join(', ')}</b><br/>Your score is: <br/> <b> $_wordRecallPoints out of 3.</b>",
                       ),
                       Stack(
                         children: [
@@ -309,7 +431,7 @@ class _StepperPageState extends State<StepperPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8.0),
                               color: Colors.grey.shade300,
-                            ),
+                          ),
                             child: LinearProgressIndicator(
                               value: _wordRecallPoints/3,
                               valueColor: const AlwaysStoppedAnimation<Color>(Colors.purple),
@@ -347,7 +469,7 @@ class _StepperPageState extends State<StepperPage> {
                 child: Column(
                   children: [
                     Html(
-                        data: "<span style='color: purple;'><b>Clock Draw:</b></span>",
+                        data: "<span style='color: purple;'><b>Clock Draw:</b>"
                     ),
                     if (_imageFilePath == null)
                       const CircularProgressIndicator() // Show a loading indicator while waiting for initialization
@@ -361,7 +483,7 @@ class _StepperPageState extends State<StepperPage> {
                     else
                       Text('No image found at the specified path $_imageFilePath'),
                     Html(
-                      data: "<b>Clock Draw Points:</b> $_clockDrawingPoints out of 2",
+                      data: "Clock Draw Points:</b> $_clockDrawingPoints out of 2",
                     ),
                     const SizedBox(height: 10),
                     Stack(
@@ -399,9 +521,7 @@ class _StepperPageState extends State<StepperPage> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    Html(
-                      data: "<b>Clock Draw feedback:</b>"
-                    ),
+                    const Text("Clock Draw feedback:"),
                     const SizedBox(height: 10),
                     Text(_clockDrawingFeedback),
                   ],
@@ -410,18 +530,26 @@ class _StepperPageState extends State<StepperPage> {
             ),
             
             const SizedBox(height: 10),
-            Html(
-                data: "<span style='color: purple;'><b>Total Score:</b></span> <b>${_wordRecallPoints+_clockDrawingPoints}</b>",
-            ),
+            Text("Total Score: ${_wordRecallPoints+_clockDrawingPoints}"),
             const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: ElevatedButton(
-                onPressed: () {
-                  resetState();
-                },
-                child: const Text('Reset'),
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min, // Makes the button width fit the content
+              mainAxisAlignment: MainAxisAlignment.center, // Center-aligns the icon and text
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    sendReport();
+                  },
+                  child: const Text('Send Report'),
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    resetState();
+                  },
+                  child: const Text('Reset'),
+                ),
+              ]
             ),
           ],
         ),
@@ -474,7 +602,7 @@ class _StepperPageState extends State<StepperPage> {
     }
   }
 
-    Future<void> _listen() async {
+  Future<void> _listen() async {
     print("islistening:$_isListening");
     if (!_isListening) {
       if (!_speechToText.isAvailable) {
@@ -498,28 +626,12 @@ class _StepperPageState extends State<StepperPage> {
       _speechToText.stop();
     }
   }
-  /*
-  Future<void> _sendToChatGPT(String userInput) async {
-    if (userInput.isEmpty) return;
-
-    final request = ChatCompleteText(
-      messages: [
-        Map.of({"role": "user", "content": userInput})
-      ],
-      maxToken: 100,
-      model: Gpt4OChatModel(),
-    );
-
-    final response = await openAI.onChatCompletion(request: request);
-    if (response != null) {
-      String answerJSON = response.choices[0].message?.content.trim() ?? 'No response';
-      Map<String, dynamic> jsonData = jsonDecode(answerJSON);
-    }
-  }*/
   
   @override
   Widget build(BuildContext context) {
-    return Scaffold (
+    return RepaintBoundary(
+        key: resultContainer,
+        child: Scaffold (
       appBar: AppBar(
         title: const Text('EasyMemo'),
       ),
@@ -569,7 +681,8 @@ class _StepperPageState extends State<StepperPage> {
               ),
             ),
           ),
-      );
+      )
+    );
   }
 
   List<Step> steps(int points, String feedback) => [

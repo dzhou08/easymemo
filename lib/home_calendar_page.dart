@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
-import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'auth_provider.dart';
 import 'home_date_display.dart';
-import 'home_task_checkbox_list.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_html/flutter_html.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
