@@ -205,7 +205,7 @@ class _AskingPageState extends State<AskingPage> {
 
     final openAI = OpenAI.instance.build(
       token: dotenv.env['OPENAI_API_KEY'].toString(),
-      baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 5)),
+      baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 30)),
       enableLog: true
     );
     
@@ -230,7 +230,7 @@ class _AskingPageState extends State<AskingPage> {
         String imageAnalysisInstruction = """
                   Help me to analyze the image file for an ALzheimer patient or an eldly person. 
                   Explain what is shown in the image with details;
-                  If the image contains an object like ATM machine etc, include detailed instruction on how they can interact with the object;
+                  Include detailed instruction on how user can interact with the object inside the image;
                   """;
 
         // Step 4: Create a ChatCompleteText request for OpenAI

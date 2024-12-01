@@ -311,7 +311,7 @@ class _StepperPageState extends State<StepperPage> {
 
   final openAI = OpenAI.instance.build(
     token: dotenv.env['OPENAI_API_KEY'].toString(),
-    baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 5)),
+    baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 30)),
     enableLog: true
   );
 
