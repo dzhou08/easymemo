@@ -14,3 +14,5 @@ EasyMemo is a Flutter application.
 For more resources on Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+# Release by Github Action
