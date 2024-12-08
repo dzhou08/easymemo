@@ -9,9 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Create .env file
+      - uses: actions/checkout@v4
+      - name: Create assets/.env file
         run: |
-          cat > .env <<EOF
+          cat > assets/.env <<EOF
           FIREBASE_API_KEY_WEB=${{ secrets.FIREBASE_API_KEY_WEB }}
           FIREBASE_API_KEY_ANDROID=${{ secrets.FIREBASE_API_KEY_ANDROID }}
           FIREBASE_API_KEY_IOS=${{ secrets.FIREBASE_API_KEY_IOS }} 
@@ -32,7 +33,6 @@ jobs:
           OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
           EOF
 
-      - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
