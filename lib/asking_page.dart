@@ -68,7 +68,7 @@ class _AskingPageState extends State<AskingPage> {
     final token = authProvider.getAccessToken();
 
     if (token != null) {
-      _searchFilesByName(token, 'memo.txt');
+      _searchFilesByName(token, 'memo');
     }
   }
 
@@ -229,8 +229,9 @@ class _AskingPageState extends State<AskingPage> {
         // Step 3: Construct the image analysis instruction
         String imageAnalysisInstruction = """
                   Help me to analyze the image file for an ALzheimer patient or an eldly person. 
-                  Explain what is shown in the image with details;
-                  Include detailed instruction on how user can interact with the object inside the image;
+                  Answer question based on the image content. 
+                  Return a Yes or No answer for simple questions. If you do not have a clear answer, just say no.
+                  Explain the image content if needed.
                   """;
 
         // Step 4: Create a ChatCompleteText request for OpenAI
