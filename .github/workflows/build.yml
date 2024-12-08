@@ -18,15 +18,15 @@ jobs:
       - run: flutter pub get
 
       - run: |
-        flutter build web --release --web-renderer=auto --base-href /easymemo/ \
-        --dart-define=FIREBASE_API_KEY_WEB=${{ secrets.FIREBASE_API_KEY_WEB }} \
-        --dart-define=FIREBASE_APP_ID_WEB=${{ secrets.FIREBASE_APP_ID_WEB }} \
-        --dart-define=FIREBASE_MESSAGE_SENDER_ID=${{ secrets.FIREBASE_MESSAGE_SENDER_ID }} \
-        --dart-define=FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }} \
-        --dart-define=FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID }} \
-        --dart-define=FIREBASE_IOS_CLIENT_ID=${{ secrets.FIREBASE_IOS_CLIENT_ID }} \
-        --dart-define=FIREBASE_IOS_BUNDLE_ID=${{ secrets.FIREBASE_IOS_BUNDLE_ID }} \
-        --dart-define=OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          flutter build web --release --web-renderer=auto --base-href /easymemo/ \
+          --dart-define=FIREBASE_API_KEY_WEB=${{ secrets.FIREBASE_API_KEY_WEB }} \
+          --dart-define=FIREBASE_APP_ID_WEB=${{ secrets.FIREBASE_APP_ID_WEB }} \
+          --dart-define=FIREBASE_MESSAGE_SENDER_ID=${{ secrets.FIREBASE_MESSAGE_SENDER_ID }} \
+          --dart-define=FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }} \
+          --dart-define=FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID }} \
+          --dart-define=FIREBASE_IOS_CLIENT_ID=${{ secrets.FIREBASE_IOS_CLIENT_ID }} \
+          --dart-define=FIREBASE_IOS_BUNDLE_ID=${{ secrets.FIREBASE_IOS_BUNDLE_ID }} \
+          --dart-define=OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
       
       - uses: bluefireteam/flutter-gh-pages@v7
         with:
