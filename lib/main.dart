@@ -23,11 +23,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'env_config.dart';
 
+import 'package:flutter/foundation.dart';
+
 Future main() async {
   // To load the .env file contents into dotenv.
   // NOTE: fileName defaults to .env and can be omitted in this case.
   // Ensure that the filename corresponds to the path in step 1 and 2.
-  await dotenv.load(fileName: ".env");
+  // Load .env only in development mode
+  if (!kReleaseMode) {
+    await dotenv.load(fileName: ".env");
+  }
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
