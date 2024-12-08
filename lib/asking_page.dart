@@ -12,6 +12,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:provider/provider.dart';
 import 'auth_provider.dart';
+import 'env_config.dart';
 
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
@@ -204,7 +205,7 @@ class _AskingPageState extends State<AskingPage> {
     });
 
     final openAI = OpenAI.instance.build(
-      token: dotenv.env['OPENAI_API_KEY'].toString(),
+      token: EnvConfig.openAIApiKey,
       baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 30)),
       enableLog: true
     );

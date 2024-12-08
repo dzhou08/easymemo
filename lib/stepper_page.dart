@@ -22,6 +22,7 @@ import 'package:provider/provider.dart';
 import 'auth_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'env_config.dart';
 
 
 
@@ -310,7 +311,7 @@ class _StepperPageState extends State<StepperPage> {
   }
 
   final openAI = OpenAI.instance.build(
-    token: dotenv.env['OPENAI_API_KEY'].toString(),
+    token: EnvConfig.openAIApiKey,
     baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 30)),
     enableLog: true
   );
