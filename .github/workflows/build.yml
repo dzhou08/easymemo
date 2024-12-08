@@ -32,6 +32,4 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-      - uses: erickzanardo/flutter-gh-pages@v7
-        with:
-          basehref: /easymemo/
+      - uses: bluefireteam/flutter-gh-pages@v7
