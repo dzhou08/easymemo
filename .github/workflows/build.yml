@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Create .env file
         run: |
-          cat > assets/.env << EOF
+          cat > .env <<EOF
           FIREBASE_API_KEY_WEB=${{ secrets.FIREBASE_API_KEY_WEB }}
           FIREBASE_API_KEY_ANDROID=${{ secrets.FIREBASE_API_KEY_ANDROID }}
           FIREBASE_API_KEY_IOS=${{ secrets.FIREBASE_API_KEY_IOS }} 
