@@ -10,7 +10,7 @@ class EnvConfig {
       return dotenv.env[name].toString();
     }
     else {
-      return String.fromEnvironment(name);
+      return String.fromEnvironment(name, defaultValue: '');
     }
   }
 
