@@ -17,31 +17,17 @@ jobs:
       
       - run: flutter pub get
 
-      - run: flutter build web --release --web-renderer=auto --base-href /easymemo/
-
-      - run: ls -l build/web
+      - run: flutter build web --release --web-renderer=auto --base-href /easymemo/ \
+            --dart-define=FIREBASE_API_KEY_WEB=${{ secrets.FIREBASE_API_KEY_WEB }} \
+            --dart-define=FIREBASE_APP_ID_WEB=${{ secrets.FIREBASE_APP_ID_WEB }} \
+            --dart-define=FIREBASE_MESSAGE_SENDER_ID=${{ secrets.FIREBASE_MESSAGE_SENDER_ID }} \
+            --dart-define=FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }} \
+            --dart-define=FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID }} \
+            --dart-define=FIREBASE_IOS_CLIENT_ID=${{ secrets.FIREBASE_IOS_CLIENT_ID }} \
+            --dart-define=FIREBASE_IOS_BUNDLE_ID=${{ secrets.FIREBASE_IOS_BUNDLE_ID }} \
+            --dart-define=OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
       
       - uses: bluefireteam/flutter-gh-pages@v7
         with:
           args: --no-clean
           baseHref: /easymemo/
-          customArgs: >
-            --dart-define=FIREBASE_API_KEY_WEB=${{ secrets.FIREBASE_API_KEY_WEB }}
-            --dart-define=FIREBASE_API_KEY_ANDROID=${{ secrets.FIREBASE_API_KEY_ANDROID }}
-            --dart-define=FIREBASE_API_KEY_IOS=${{ secrets.FIREBASE_API_KEY_IOS }}
-            --dart-define=FIREBASE_API_KEY_MACOS=${{ secrets.FIREBASE_API_KEY_MACOS }}
-            --dart-define=FIREBASE_API_KEY_WINDOWS=${{ secrets.FIREBASE_API_KEY_WINDOWS }}
-
-            --dart-define=FIREBASE_APP_ID_WEB=${{ secrets.FIREBASE_APP_ID_WEB }}
-            --dart-define=FIREBASE_APP_ID_ANDROID=${{ secrets.FIREBASE_APP_ID_ANDROID }}
-            --dart-define=FIREBASE_APP_ID_IOS=${{ secrets.FIREBASE_APP_ID_IOS }}
-            --dart-define=FIREBASE_APP_ID_MACOS=${{ secrets.FIREBASE_APP_ID_MACOS }}
-            --dart-define=FIREBASE_APP_ID_WINDOWS=${{ secrets.FIREBASE_APP_ID_WINDOWS }}
-
-            --dart-define=FIREBASE_MESSAGE_SENDER_ID=${{ secrets.FIREBASE_MESSAGE_SENDER_ID }}
-            --dart-define=FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
-            --dart-define=FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID }}
-            --dart-define=FIREBASE_IOS_CLIENT_ID=${{ secrets.FIREBASE_IOS_CLIENT_ID }}
-            --dart-define=FIREBASE_IOS_BUNDLE_ID=${{ secrets.FIREBASE_IOS_BUNDLE_ID }}
-
-            --dart-define=OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
