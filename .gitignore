@@ -1,4 +1,7 @@
 .env
+assets/.env
+**/.env
+
 **/GoogleService-Info.plist
 
 # Miscellaneous
