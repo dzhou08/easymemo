@@ -37,6 +37,7 @@ Future main() async {
 
   try {
     if (kIsWeb) {
+      print(kIsWeb);
       await Firebase.initializeApp(
         options: FirebaseOptions(
             apiKey: EnvConfig.firebaseApiKeyWeb,
@@ -289,71 +290,73 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
             );
           } else {
-            return Row(
-              children: [
-                SafeArea(
-                  child: authProvider.getGoogleUser() == null
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(height: 20),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0), // Add padding for better spacing
-                                  alignment: Alignment.center, // Align content to the center
-                                ),
-                                onPressed: () {
-                                  authProvider.signInWithGoogle();
-                                },
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min, // Makes the button width fit the content
-                                  mainAxisAlignment: MainAxisAlignment.center, // Center-aligns the icon and text
-                                    
-                                  children: [
-                                    SvgPicture.asset(
-                                      'assets/icons/google.svg', // Path to your SVG asset
-                                      width: 30.0, // Adjust the size as needed
-                                      height: 30.0,
-                                    ),
-                                    SizedBox(width: 8.0),
-                                    Text('Sign in with Google'),
-                                  ],
-                                ) 
+            return 
+              SafeArea(
+                child: authProvider.getGoogleUser() == null
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(height: 20),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0), // Add padding for better spacing
+                                alignment: Alignment.center, // Align content to the center
                               ),
-                            ],
-                          ),
-                        )
-                      : NavigationRail(
-                          extended: constraints.maxWidth >= 600,
-                          destinations: [
-                            NavigationRailDestination(
-                              icon: Icon(Icons.home),
-                              label: Text('Home'),
-                            ),
-                            NavigationRailDestination(
-                              icon: Icon(Icons.medical_information),
-                              label: Text('Mini-Cog™'),
-                            ),
-                            NavigationRailDestination(
-                              icon: Icon(Icons.phone),
-                              label: Text('Contacts'),
-                            ),
-                            NavigationRailDestination(
-                              icon: Icon(Icons.mic),
-                              label: Text('Ask Me!'),
+                              onPressed: () {
+                                authProvider.signInWithGoogle();
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min, // Makes the button width fit the content
+                                mainAxisAlignment: MainAxisAlignment.center, // Center-aligns the icon and text
+                                  
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/google.svg', // Path to your SVG asset
+                                    width: 30.0, // Adjust the size as needed
+                                    height: 30.0,
+                                  ),
+                                  SizedBox(width: 8.0),
+                                  Text('Sign in with Google'),
+                                ],
+                              ) 
                             ),
                           ],
-                          selectedIndex: selectedIndex,
-                          onDestinationSelected: (value) {
-                            setState(() {
-                              selectedIndex = value;
-                            });
-                          },
                         ),
-                ),
-                Expanded(child: mainArea),
-              ],
+                      )
+                      : 
+                      Row(
+                        children: [
+                          NavigationRail(
+                            extended: constraints.maxWidth >= 600,
+                            destinations: [
+                              NavigationRailDestination(
+                                icon: Icon(Icons.home),
+                                label: Text('Home'),
+                              ),
+                              NavigationRailDestination(
+                                icon: Icon(Icons.medical_information),
+                                label: Text('Mini-Cog™'),
+                              ),
+                              NavigationRailDestination(
+                                icon: Icon(Icons.phone),
+                                label: Text('Contacts'),
+                              ),
+                              NavigationRailDestination(
+                                icon: Icon(Icons.mic),
+                                label: Text('Ask Me!'),
+                              ),
+                            ],
+                            selectedIndex: selectedIndex,
+                            onDestinationSelected: (value) {
+                              setState(() {
+                                selectedIndex = value;
+                              });
+                            },
+                          ),
+                          Expanded(child: mainArea),
+                        ]
+                      ),
             );
           }
         },
