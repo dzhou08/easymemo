@@ -435,6 +435,7 @@ class _AskingPageState extends State<AskingPage> {
                     ],
                   ),
                 ),
+                const SizedBox(width: 15),
                 ElevatedButton(
                   onPressed: _clearMessages,  // Call the clear function to clear messages
                   child: Row(
