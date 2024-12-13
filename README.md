@@ -15,4 +15,10 @@ For more resources on Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-# Release by Github Action
+# Release to Firebase
+`flutter build web`
+
+`firebase experiments:enable webframeworks`
+
+`firebase deploy`
+

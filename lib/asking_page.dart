@@ -20,8 +20,8 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io' as Io;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-
-
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 class AskingPage extends StatefulWidget {
   const AskingPage({Key? key}) : super(key: key);
@@ -308,13 +308,36 @@ class _AskingPageState extends State<AskingPage> {
 
       if (mounted) {
         setState(() {
-
           messages.add({'assistant': answer});
           inputLabelText='Enter your message';
           _isLoading = false;
         });
       }
     }
+  }
+
+  // Function to read out the messages list
+  void _readMessages() {
+    FlutterTts flutterTts = FlutterTts();
+    flutterTts.setLanguage("en-US");
+    flutterTts.setSpeechRate(0.3);
+    flutterTts.setVolume(1.0);
+    flutterTts.setPitch(1.0);
+
+    String readMessageContent = '';
+
+    // loop through all messages
+    // Loop through all messages
+    for (var message in messages) {
+      if (message.containsKey('user')) {
+        // Safely access 'user' and append to the string
+        readMessageContent += "From User: ${message['user'] ?? ''}  ";
+      } else if (message.containsKey('assistant')) {
+        // Safely access 'assistant' and append to the string
+        readMessageContent += "From EasyMemo: ${message['assistant'] ?? ''} ";
+      }
+    }
+    flutterTts.speak(readMessageContent);
   }
 
   // Function to clear the messages list
@@ -395,16 +418,56 @@ class _AskingPageState extends State<AskingPage> {
             child: Row(
               mainAxisSize: MainAxisSize.min, // Makes the button width fit the content
               mainAxisAlignment: MainAxisAlignment.center, // Center-aligns the icon and text
-                
               children: [
                 ElevatedButton(
+                  onPressed: _readMessages,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min, // Makes the button width fit the content
+                    mainAxisAlignment: MainAxisAlignment.center, // Center-aligns the icon and text
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/microphone.svg', // Path to your SVG asset
+                        width: 20.0, // Adjust the size as needed
+                        height: 20.0,
+                      ),
+                      const SizedBox(width: 8.0),
+                      const Text('Read Messages'),
+                    ],
+                  ),
+                ),
+                ElevatedButton(
                   onPressed: _clearMessages,  // Call the clear function to clear messages
-                  child: const Text('Clear Messages'),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min, // Makes the button width fit the content
+                    mainAxisAlignment: MainAxisAlignment.center, // Center-aligns the icon and text
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/delete.svg', // Path to your SVG asset
+                        width: 20.0, // Adjust the size as needed
+                        height: 20.0,
+                      ),
+                      const SizedBox(width: 8.0),
+                      const Text('Clear Messages'),
+                    ],
+                  ),
                 ),
                 const SizedBox(width: 15),
                 ElevatedButton(
                   onPressed: _clearQuestion,  // Call the clear function to clear question
-                  child: const Text('Clear Question'),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min, // Makes the button width fit the content
+                    mainAxisAlignment: MainAxisAlignment.center, // Center-aligns the icon and text
+                      
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/delete.svg', // Path to your SVG asset
+                        width: 20.0, // Adjust the size as needed
+                        height: 20.0,
+                      ),
+                      const SizedBox(width: 8.0),
+                      const Text('Clear Questions'),
+                    ],
+                  ),
                 ),
               ]
             )
