@@ -25,6 +25,8 @@ class _PhonePageState extends State<PhonePage> {
   String? token;
   List<dynamic> values = []; // To store the fetched Google Sheet data
 
+  bool _isImageFailed = false;
+
   // Check if the current device is a simulator/emulator
   /*Future<bool> _isSimulator() async {
     final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -52,6 +54,9 @@ class _PhonePageState extends State<PhonePage> {
 
   // Read Google Sheet data
   Future<void> _readGoogleSheet(String accessToken) async {
+    if (!values.isEmpty)
+      return;
+
     String spreadsheetId = '1BDvsJVw3bffGMuRsKDyJHACDIBT9HOgcUDNdBqu_RXs';
     String range = 'Sheet1!A1:D7';
 
@@ -137,10 +142,8 @@ class _PhonePageState extends State<PhonePage> {
             String name = values[index][0];        // Access the first column (Name)
             String relationship = values[index][1];    // Access the second column (Relationship)
             String avatarName = values[index][2];  // Access the third column (Avatar Name)
-            String avatarJSONLink = values[index][3];  // Access the forth column (Avatar Link)
-
-            String fileId = extractFileId(avatarJSONLink);
-            String avatarLink = "https://drive.google.com/uc?export=view&id=$fileId";
+            String avatarLink = values[index][3];  // Access the forth column (Avatar Link)
+            // "https://drive.google.com/uc?export=view&id=$fileId";
             //avatarLink = "https://www.w3schools.com/w3images/lights.jpg";
 
             return AbsorbPointer(
@@ -166,15 +169,17 @@ class _PhonePageState extends State<PhonePage> {
                           elevation: 5.0,
                           cacheImage: false,
                           showInitialTextAbovePicture: false,
-                          child: CachedNetworkImage(
-                            imageUrl: avatarLink,
-                            placeholder: (context, url) => const CircularProgressIndicator(),
-                            errorWidget: (context, url, error) {
-                              print('Error loading image: $avatarLink $error');
-                              return const Icon(Icons.error, size: 50);
-                            },
-                            fit: BoxFit.cover,
-                          ),
+                          child: _isImageFailed
+                            ? const Icon(Icons.error, size: 50) // Show error if image fails to load
+                            :CachedNetworkImage(
+                              imageUrl: avatarLink,
+                              placeholder: (context, url) => const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) {
+                                print('Error loading image: $avatarLink $error');
+                                return const Icon(Icons.error, size: 50);
+                              },
+                              fit: BoxFit.cover,
+                            ),
                         ),
                         const SizedBox(width: 20),  // Add spacing between avatar and details
                         Expanded(

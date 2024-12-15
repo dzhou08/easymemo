@@ -370,50 +370,7 @@ class _AskingPageState extends State<AskingPage> {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final message = messages[index];
-                print(message);
-                // Display either user or assistant message
-                return SingleChildScrollView(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (message.containsKey('user')) 
-                        const Icon(
-                          Icons.person, 
-                          color: Colors.purple
-                        ),  // Replace "Assistant:" with an icon
-                      
-                      if (message.containsKey('assistant')) 
-                        const Icon(
-                          Icons.smart_toy,
-                          color: Colors.purple,
-                        ),
-                      const SizedBox(width: 8), // Add some spacing between the icon and the text
-                      
-                      Expanded(
-                        child: Text(
-                          message.containsKey('user')
-                              ? message['user'] ?? ''  // Handle null user messages
-                              : message['assistant'] ?? '',       // Handle null assistant messages
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-          /*if (_fileContent != null) Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('File Content: $_fileContent'),
-          ),*/
-          // Clear Messages Button
-          Padding(
+                    Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               mainAxisSize: MainAxisSize.min, // Makes the button width fit the content
@@ -472,6 +429,42 @@ class _AskingPageState extends State<AskingPage> {
                 ),
               ]
             )
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final message = messages[index];
+                print(message);
+                // Display either user or assistant message
+                return SingleChildScrollView(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (message.containsKey('user'))
+                        const Icon(
+                          Icons.person,
+                          color: Colors.purple
+                        ),  // Replace "Assistant:" with an icon
+                      if (message.containsKey('assistant'))
+                        const Icon(
+                          Icons.smart_toy,
+                          color: Colors.purple,
+                        ),
+                      const SizedBox(width: 8), // Add some spacing between the icon and the text
+                      Expanded(
+                        child: Text(
+                          message.containsKey('user')
+                              ? message['user'] ?? ''  // Handle null user messages
+                              : message['assistant'] ?? '',       // Handle null assistant messages
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
           // Display selected image with a delete button (if any)
           if (_image != null)
