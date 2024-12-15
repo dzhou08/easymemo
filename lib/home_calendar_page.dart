@@ -23,11 +23,23 @@ class CalendarPageState extends State<CalendarPage> {
   // Track the checked state for each item
   List<bool> _checked = [];
 
+  // get today's date string of format 2024-12-15
+  String todayDateString = "";
+
   @override
   void initState() {
     super.initState();
     final authProvider = Provider.of<GAuthProvider>(context, listen: false);
     _googleAccessToken = authProvider.getAccessToken();
+    // get today's date string of format 2024-12-15
+    todayDateString = getTodayDate();
+  }
+  String getTodayDate() {
+    final now = DateTime.now();
+    final year = now.year;
+    final month = now.month.toString().padLeft(2, '0'); // Ensure 2 digits
+    final day = now.day.toString().padLeft(2, '0');     // Ensure 2 digits
+    return '$year-$month-$day';
   }
 
   // Function to get Google Calendar events
@@ -36,10 +48,12 @@ class CalendarPageState extends State<CalendarPage> {
       return;
     }
 
-    print(accessToken);
+    String googleQueryString = 'https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${todayDateString}T00:00:00Z&timeMax=${todayDateString}T23:59:59Z';
+    print(googleQueryString);
+
     // Make the authorized API request to Google Calendar
     var response = await http.get(
-      Uri.parse('https://www.googleapis.com/calendar/v3/calendars/primary/events'),
+      Uri.parse(googleQueryString),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
@@ -104,8 +118,10 @@ class CalendarPageState extends State<CalendarPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${DateFormat('HH:mm').format(DateTime.parse(_events[index]['start']['dateTime']).toLocal())} - '
-                                '${DateFormat('HH:mm').format(DateTime.parse(_events[index]['end']['dateTime']).toLocal())}',
+                                (_events[index]['start'] == null || _events[index]['end'] == null)
+                                    ? "all day"
+                                    : '${DateFormat('HH:mm').format(DateTime.parse(_events[index]['start']['dateTime'] ?? todayDateString).toLocal())} - '
+                                      '${DateFormat('HH:mm').format(DateTime.parse(_events[index]['end']['dateTime'] ?? todayDateString).toLocal())}',
                                 style: const TextStyle(fontSize: 12), // Smaller font size for compactness
                               ),
                             ],
@@ -117,14 +133,14 @@ class CalendarPageState extends State<CalendarPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  _events[index]['summary'],
+                                  _events[index]['summary']??"summary",
                                   style: const TextStyle(
                                     fontSize: 14, // Smaller font size for a more compact look
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 Text(
-                                  _events[index]['description'].replaceAll(exp, ''),
+                                  _events[index]['description']??"",//.replaceAll(exp, ''),
                                   style: const TextStyle(
                                     fontSize: 12, // Smaller font size for a more compact look
                                     fontWeight: FontWeight.bold,

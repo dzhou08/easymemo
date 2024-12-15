@@ -258,7 +258,7 @@ class _StepperPageState extends State<StepperPage> {
       
       var driveApi = DriveApi(_httpClient);
       final fileToUpload = File()
-      ..name = 'MiniCog_report_${timestampFileName}.pdf'
+      ..name = 'MiniCog_report_$timestampFileName.pdf'
       ..parents = [driveFolderId!];
 
       final uploadResponse = await driveApi.files.create(
