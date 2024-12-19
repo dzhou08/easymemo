@@ -11,6 +11,7 @@ import 'my_app_state.dart';
 import 'phone_page.dart';
 import 'stepper_page.dart';
 import 'asking_page.dart';
+import 'games_page.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -188,6 +189,9 @@ class _MyHomePageState extends State<MyHomePage> {
       case 3:
         page = AskingPage();
         break;
+      case 4:
+        page = CognitiveGamesPage();
+        break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
@@ -276,6 +280,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 icon: Icon(Icons.mic),
                                 label: 'Ask Me!',
                               ),
+                              BottomNavigationBarItem(
+                                icon: Icon(Icons.games),
+                                label: 'Games',
+                              ),
                             ],
                             currentIndex: selectedIndex,
                             onTap: (value) {
@@ -357,6 +365,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                   NavigationRailDestination(
                                     icon: Icon(Icons.mic),
                                     label: Text('Ask Me!'),
+                                  ),
+                                  NavigationRailDestination(
+                                    icon: Icon(Icons.games),
+                                    label: Text('Games'),
                                   ),
                                 ],
                                 selectedIndex: selectedIndex,
