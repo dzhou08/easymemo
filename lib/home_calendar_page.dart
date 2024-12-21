@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -26,14 +28,18 @@ class CalendarPageState extends State<CalendarPage> {
   // get today's date string of format 2024-12-15
   String todayDateString = "";
 
+  GoogleSignInAccount? _user;
+
   @override
   void initState() {
     super.initState();
     final authProvider = Provider.of<GAuthProvider>(context, listen: false);
     _googleAccessToken = authProvider.getAccessToken();
+    _user = authProvider.getGoogleUser();
     // get today's date string of format 2024-12-15
     todayDateString = getTodayDate();
   }
+
   String getTodayDate() {
     final now = DateTime.now();
     final year = now.year;
@@ -73,13 +79,22 @@ class CalendarPageState extends State<CalendarPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<GAuthProvider>(context, listen: false);
+
     var colorScheme = Theme.of(context).colorScheme;
     DateFormat format = DateFormat('HH:mm:ss');
     RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EasyMemo'),
+      title: Text('EasyMemo'),
+        actions: [
+          if (_user != null)
+            ProfilePopupMenu(
+              user: _user!,
+              onSignOut: authProvider.signOut,
+            ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -168,5 +183,58 @@ class CalendarPageState extends State<CalendarPage> {
         ], 
       ),   
     );
+  }
+}
+
+class ProfilePopupMenu extends StatelessWidget {
+  final GoogleSignInAccount user;
+  final VoidCallback onSignOut;
+  final GlobalKey _key = GlobalKey();
+
+  ProfilePopupMenu({required this.user, required this.onSignOut});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        _showPopupMenu(context);
+      },
+      child: Container(
+        key: _key,
+        padding: EdgeInsets.all(8),
+        child: CircleAvatar(
+          backgroundImage: NetworkImage(user.photoUrl!),
+        ),
+      ),
+    );
+  }
+
+  void _showPopupMenu(BuildContext context) {
+    final RenderBox renderBox = _key.currentContext!.findRenderObject() as RenderBox;
+    final Offset offset = renderBox.localToGlobal(Offset.zero);
+
+    showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        offset.dx, // Horizontal position
+        offset.dy + renderBox.size.height, // Vertical position just below the avatar
+        0,
+        0,
+      ),
+      items: [
+        PopupMenuItem<String>(
+          value: 'Profile',
+          child: Text('Profile'),
+        ),
+        PopupMenuItem<String>(
+          value: 'Logout',
+          child: Text('Logout'),
+        ),
+      ],
+    ).then((value) {
+      if (value == 'Logout') {
+        onSignOut();
+      }
+    });
   }
 }

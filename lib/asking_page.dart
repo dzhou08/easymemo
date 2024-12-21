@@ -8,7 +8,6 @@ import 'dart:convert';  // Import for JSON parsing
 // Ensure this import is present
 // For handling file content
 // For making API requests
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:provider/provider.dart';
 import 'auth_provider.dart';

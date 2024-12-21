@@ -54,6 +54,13 @@ class GAuthProvider with ChangeNotifier {
     }
   }
 
+  Future<void> signOut() async {
+    print("sign out");
+    await _googleSignIn.signOut();
+    _user = null;
+    notifyListeners();
+  }
+
   String? getAccessToken() {
     return _googleAuth?.accessToken;
   }

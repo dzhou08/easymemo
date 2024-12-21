@@ -25,7 +25,7 @@ class _PhonePageState extends State<PhonePage> {
   String? token;
   List<dynamic> values = []; // To store the fetched Google Sheet data
 
-  bool _isImageFailed = false;
+  final bool _isImageFailed = false;
 
   // Check if the current device is a simulator/emulator
   /*Future<bool> _isSimulator() async {
@@ -54,8 +54,9 @@ class _PhonePageState extends State<PhonePage> {
 
   // Read Google Sheet data
   Future<void> _readGoogleSheet(String accessToken) async {
-    if (!values.isEmpty)
+    if (values.isNotEmpty) {
       return;
+    }
 
     String spreadsheetId = '1BDvsJVw3bffGMuRsKDyJHACDIBT9HOgcUDNdBqu_RXs';
     String range = 'Sheet1!A1:D7';

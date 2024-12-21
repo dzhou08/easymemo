@@ -7,17 +7,19 @@ import 'games_puzzle_page.dart';
 import 'games_matching_page.dart';
 
 class CognitiveGamesPage extends StatelessWidget {
+  const CognitiveGamesPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Cognitive Games')),
+      appBar: AppBar(title: const Text('Cognitive Games')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
-          child: Container(
+          child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.5, // Set width to 60% of screen width
             child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
@@ -37,7 +39,7 @@ class CognitiveGamesPage extends StatelessWidget {
 class GameTile extends StatelessWidget {
   final int index;
 
-  GameTile({required this.index});
+  GameTile({super.key, required this.index});
 
   // Define game titles
   final List<String> gameTitles = [
@@ -85,11 +87,11 @@ class GameTile extends StatelessWidget {
               size: 50,
               color: Colors.deepPurpleAccent,
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               gameTitles[index],
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
         ),

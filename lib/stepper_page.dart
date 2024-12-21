@@ -1,13 +1,11 @@
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_drawing_board/paint_contents.dart';
 
 import 'dart:io' as Io;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -16,11 +14,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 
 import 'package:flutter_html/flutter_html.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:provider/provider.dart';
 import 'auth_provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'env_config.dart';
 
@@ -29,15 +25,11 @@ import 'env_config.dart';
 //import 'package:http/http.dart' as http;
 
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 //import 'package:enhance_stepper/enhance_stepper.dart';
-import 'rating_circle_chart.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import 'package:googleapis/drive/v3.dart';
-import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
-import 'package:googleapis_auth/googleapis_auth.dart' as auth show AuthClient;
 import 'package:http/http.dart';
 
 

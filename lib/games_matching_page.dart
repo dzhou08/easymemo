@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 class MatchingPage extends StatefulWidget {
+  const MatchingPage({super.key});
+
   @override
   _MatchingPageState createState() => _MatchingPageState();
 }
@@ -14,10 +16,10 @@ class _MatchingPageState extends State<MatchingPage> {
   ];
 
   // List of flipped cards (true means the card is flipped over)
-  List<bool> _flippedCards = List.generate(16, (_) => false);
+  final List<bool> _flippedCards = List.generate(16, (_) => false);
 
   // List to store the card values that have been revealed
-  List<String?> _revealedCards = List.generate(16, (_) => null);
+  final List<String?> _revealedCards = List.generate(16, (_) => null);
 
   int? _firstCardIndex; // Track the index of the first flipped card
   int? _secondCardIndex; // Track the index of the second flipped card
@@ -50,7 +52,7 @@ class _MatchingPageState extends State<MatchingPage> {
           _secondCardIndex = null;
         } else {
           // Cards don't match, flip them back after a delay
-          Future.delayed(Duration(seconds: 1), () {
+          Future.delayed(const Duration(seconds: 1), () {
             setState(() {
               _flippedCards[_firstCardIndex!] = false;
               _flippedCards[_secondCardIndex!] = false;
@@ -73,12 +75,12 @@ class _MatchingPageState extends State<MatchingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Memory Matching Game'),
+        title: const Text('Memory Matching Game'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 4, // Grid with 4 columns
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
@@ -89,6 +91,8 @@ class _MatchingPageState extends State<MatchingPage> {
               onTap: () => _flipCard(index),
               child: Card(
                 color: Colors.blueGrey,
+                elevation: 5,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 child: Center(
                   child: _flippedCards[index]
                       ? Text(
@@ -97,8 +101,6 @@ class _MatchingPageState extends State<MatchingPage> {
                         )
                       : Container(),
                 ),
-                elevation: 5,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
             );
           },

@@ -1,10 +1,8 @@
-
-    // Photo by <a href="https://unsplash.com/@leajourniac?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Léa Journiac</a> 
-    // on <a href="https://unsplash.com/photos/a-white-dog-is-jumping-in-the-air-5eAmYBA9eV0?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
-    // Split the image into 9 pieces
 import 'package:flutter/material.dart';
 
 class PuzzlePage extends StatefulWidget {
+  const PuzzlePage({super.key});
+
   @override
   _PuzzlePageState createState() => _PuzzlePageState();
 }
@@ -23,9 +21,7 @@ class _PuzzlePageState extends State<PuzzlePage> {
   // Method to restart the game
   void restartGame() {
     setState(() {
-      // Reset the grid images to null
       gridImages = List.generate(3, (i) => List<String?>.filled(3, null));
-      // Optionally shuffle the draggable images again if desired
       draggableImages = List.generate(9, (index) {
         int row = index ~/ 3;
         int col = index % 3;
@@ -38,25 +34,23 @@ class _PuzzlePageState extends State<PuzzlePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Image Grid Puzzle'),
+        title: const Text('Image Grid Puzzle'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            // Instruction text
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
-                'Drag and drop the images into the 3x3 grid below. Enjoy the smiling Shiba Ino picture!',
+                'Drag and drop the images into the 3x3 grid below. Enjoy the smiling Shiba Inu picture!',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
             ),
-            SizedBox(height: 16),
-            // Draggable images section
+            const SizedBox(height: 16),
             Center(
-              child: Container(
+              child: SizedBox(
                 height: 120,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -64,7 +58,7 @@ class _PuzzlePageState extends State<PuzzlePage> {
                     Expanded(
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: 9,
+                        itemCount: draggableImages.length,
                         itemBuilder: (context, index) {
                           return Draggable<String>(
                             data: draggableImages[index],
@@ -74,10 +68,11 @@ class _PuzzlePageState extends State<PuzzlePage> {
                               height: 80,
                               fit: BoxFit.cover,
                             ),
+                            childWhenDragging: const SizedBox(),
                             child: Container(
                               width: 80,
                               height: 80,
-                              margin: EdgeInsets.symmetric(horizontal: 4),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.black),
                               ),
@@ -94,14 +89,13 @@ class _PuzzlePageState extends State<PuzzlePage> {
                 ),
               ),
             ),
-            SizedBox(height: 16),
-            // 3x3 grid section
+            const SizedBox(height: 16),
             Expanded(
               child: Center(
-                child: Container(
+                child: SizedBox(
                   width: MediaQuery.of(context).size.width * 0.4,
                   child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       crossAxisSpacing: 4,
                       mainAxisSpacing: 4,
@@ -111,9 +105,14 @@ class _PuzzlePageState extends State<PuzzlePage> {
                       int row = index ~/ 3;
                       int col = index % 3;
                       return DragTarget<String>(
-                        onAccept: (droppedImagePath) {
+                        onWillAccept: (data) => true,
+                        onAcceptWithDetails: (details) {
                           setState(() {
-                            gridImages[row][col] = droppedImagePath;
+                            if (gridImages[row][col] != null) {
+                              draggableImages.add(gridImages[row][col]!);
+                            }
+                            gridImages[row][col] = details.data;
+                            draggableImages.remove(details.data);
                           });
                         },
                         builder: (context, candidateData, rejectedData) {
@@ -123,16 +122,27 @@ class _PuzzlePageState extends State<PuzzlePage> {
                               color: Colors.grey[100],
                             ),
                             child: gridImages[row][col] != null
-                                ? Image.asset(
-                                    gridImages[row][col]!,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Center(
-                                    child: Text(
-                                      '',//'Row: $row\nCol: $col',
-                                      textAlign: TextAlign.center,
+                                ? Draggable<String>(
+                                    data: gridImages[row][col]!,
+                                    feedback: Image.asset(
+                                      gridImages[row][col]!,
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
                                     ),
-                                  ),
+                                    childWhenDragging: const SizedBox(),
+                                    onDragCompleted: () {
+                                      setState(() {
+                                        draggableImages.add(gridImages[row][col]!);
+                                        gridImages[row][col] = null;
+                                      });
+                                    },
+                                    child: Image.asset(
+                                      gridImages[row][col]!,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : const SizedBox(),
                           );
                         },
                       );
@@ -141,13 +151,11 @@ class _PuzzlePageState extends State<PuzzlePage> {
                 ),
               ),
             ),
-            //SizedBox(height: 8),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center, // Align buttons horizontally in the center
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Calculate the score
                     int score = 0;
                     for (int row = 0; row < 3; row++) {
                       for (int col = 0; col < 3; col++) {
@@ -156,31 +164,29 @@ class _PuzzlePageState extends State<PuzzlePage> {
                         }
                       }
                     }
-                    // Show the score
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: Text('Score'),
-                        content: Text('Your score is $score/9'),
+                        title: const Text('Score'),
+                        content: Text('Your score is ${score}/9'),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text('OK'),
+                            child: const Text('OK'),
                           ),
                         ],
                       ),
                     );
                   },
-                  child: Text('Confirm Selection'),
+                  child: const Text('Confirm Selection'),
                 ),
-                SizedBox(width: 16), // Add some space between the buttons
+                const SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: restartGame,
-                  child: Text('Reset'),
+                  child: const Text('Reset'),
                 ),
               ],
-            )
-
+            ),
           ],
         ),
       ),

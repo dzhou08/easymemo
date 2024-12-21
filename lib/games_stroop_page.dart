@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class StroopPage extends StatefulWidget {
+  const StroopPage({super.key});
+
   @override
   _StroopPageState createState() => _StroopPageState();
 }
@@ -46,7 +48,7 @@ class _StroopPageState extends State<StroopPage> {
     });
 
     _nextQuestion();
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         _timeRemaining--;
         if (_timeRemaining <= 0) {
@@ -87,14 +89,14 @@ class _StroopPageState extends State<StroopPage> {
         ),
         child: Text(
           colorName,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
       );
     }).toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Stroop Test'),
+        title: const Text('Stroop Test'),
         centerTitle: true,
       ),
       body: Padding(
@@ -103,58 +105,58 @@ class _StroopPageState extends State<StroopPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Persistent instructions
-            Text(
+            const Text(
               'In this test, you will be shown a word displayed in a specific color. Your task is to identify the color of the text, not the word itself. Tap the button that matches the color of the word.',
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Game state or start/restart button
             if (_isGameOver) ...[
               Text(
                 'Game Over! Your score: $_score',
-                style: TextStyle(fontSize: 20),
+                style: const TextStyle(fontSize: 20),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _startGame,
-                child: Text('Restart Game'),
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  textStyle: TextStyle(fontSize: 18),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  textStyle: const TextStyle(fontSize: 18),
                 ),
+                child: Text('Restart Game'),
               ),
             ] else if (_isGameStarted) ...[
               Text(
                 'Time Remaining: $_timeRemaining',
-                style: TextStyle(fontSize: 20),
+                style: const TextStyle(fontSize: 20),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text(
                 _currentWord,
                 style: TextStyle(fontSize: 40, color: _currentColor),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Wrap(
                 spacing: 10,
                 children: buttons,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text(
                 'Score: $_score',
-                style: TextStyle(fontSize: 20),
+                style: const TextStyle(fontSize: 20),
               ),
             ] else ...[
               Center(
                 child: ElevatedButton(
                   onPressed: _startGame,
-                  child: Text('Start Game'),
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    textStyle: TextStyle(fontSize: 18),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    textStyle: const TextStyle(fontSize: 18),
                   ),
+                  child: Text('Start Game'),
                 ),
               ),
             ],

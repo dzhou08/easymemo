@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 class SDMTPage extends StatefulWidget {
+  const SDMTPage({super.key});
+
   @override
   _SDMTPageState createState() => _SDMTPageState();
 }
@@ -25,7 +27,7 @@ class _SDMTPageState extends State<SDMTPage> {
   int score = 0;
   bool isTesting = false;
   bool isCompleted = false;
-  int _timeLimit = 30; // 30 seconds for the test
+  final int _timeLimit = 30; // 30 seconds for the test
   int _remainingTime = 30;
   late Timer _timer;
 
@@ -49,7 +51,7 @@ class _SDMTPageState extends State<SDMTPage> {
   }
 
   void _startCountdown() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         if (_remainingTime > 0) {
           _remainingTime--;
@@ -82,14 +84,14 @@ class _SDMTPageState extends State<SDMTPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Enter the number for the symbol'),
+          title: const Text('Enter the number for the symbol'),
           content: Wrap(
             spacing: 10,
             children: List.generate(10, (number) {
               return ChoiceChip(
                 label: Text(
                   number.toString(),
-                  style: TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 18),
                 ),
                 selected: selectedNumber == number.toString(),
                 onSelected: (bool selected) {
@@ -110,7 +112,7 @@ class _SDMTPageState extends State<SDMTPage> {
                 }
                 Navigator.of(context).pop();
               },
-              child: Text('Submit'),
+              child: const Text('Submit'),
             ),
           ],
         );
@@ -121,13 +123,13 @@ class _SDMTPageState extends State<SDMTPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Symbol Digit Modalities Test')),
+      appBar: AppBar(title: const Text('Symbol Digit Modalities Test')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             // Persistent instructions
-            Column(
+            const Column(
               children: [
                 Text(
                   'Instructions:',
@@ -143,28 +145,28 @@ class _SDMTPageState extends State<SDMTPage> {
               ],
             ),
             if (isTesting) ...[
-              Text(
+              const Text(
                 'Symbol to Number Mapping:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Wrap(
                 spacing: 10,
                 children: symbolToDigit.entries.map((entry) {
                   return Chip(
                     label: Text(
                       '${entry.key} -> ${entry.value}',
-                      style: TextStyle(fontSize: 20),
+                      style: const TextStyle(fontSize: 20),
                     ),
                   );
                 }).toList(),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text('Time Remaining: $_remainingTime seconds'),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Expanded(
                 child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 5,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
@@ -181,7 +183,7 @@ class _SDMTPageState extends State<SDMTPage> {
                             userAnswers[index].isEmpty
                                 ? symbols[index]
                                 : '${symbols[index]} (${userAnswers[index]})',
-                            style: TextStyle(fontSize: 24, color: Colors.white),
+                            style: const TextStyle(fontSize: 24, color: Colors.white),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -194,24 +196,24 @@ class _SDMTPageState extends State<SDMTPage> {
             if (!isTesting && !isCompleted)
               ElevatedButton(
                 onPressed: _startTest,
-                child: Text('Start Test'),
+                child: const Text('Start Test'),
               ),
             if (isCompleted)
               Column(
                 children: [
-                  Text(
+                  const Text(
                     'Test Completed!',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
                     'Your Score: $score',
-                    style: TextStyle(fontSize: 20),
+                    style: const TextStyle(fontSize: 20),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _startTest,
-                    child: Text('Restart Test'),
+                    child: const Text('Restart Test'),
                   ),
                 ],
               ),
