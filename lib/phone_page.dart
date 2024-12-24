@@ -58,7 +58,15 @@ class _PhonePageState extends State<PhonePage> {
       return;
     }
 
-    String spreadsheetId = '1BDvsJVw3bffGMuRsKDyJHACDIBT9HOgcUDNdBqu_RXs';
+    final authProvider = Provider.of<GAuthProvider>(context, listen: false);
+    String? spreadsheetId = await authProvider.findGoogleSheetByName("contacts");//'1BDvsJVw3bffGMuRsKDyJHACDIBT9HOgcUDNdBqu_RXs';
+    if (spreadsheetId == null)
+    {
+      print('Google Sheet not found');
+      return;
+    }
+
+    // found the spreadsheet, now get the data
     String range = 'Sheet1!A1:D7';
 
     final response = await http.get(

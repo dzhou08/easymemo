@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:http/http.dart';
+import 'package:googleapis/drive/v3.dart';
 
 
 class GAuthProvider with ChangeNotifier {
@@ -73,8 +74,33 @@ class GAuthProvider with ChangeNotifier {
     return _user != null;
   }
 
-Client getAuthClient() {
+  Client getAuthClient() {
     return httpClient;
+  }
+
+  Future<String?> findGoogleSheetByName(String fileName) async {
+    var driveApi = DriveApi(httpClient);
+    String? fileId;
+
+    try {
+      // Search for the file by name and ensure it's a spreadsheet
+      String queryString = "name = '$fileName' and mimeType = 'application/vnd.google-apps.spreadsheet'";
+      var fileList = await driveApi.files.list(q: queryString);
+
+      // Check if the file exists
+      if (fileList.files != null && fileList.files!.isNotEmpty) {
+        for (var file in fileList.files!) {
+          print('Found file: ${file.name} with ID: ${file.id}');
+          fileId = file.id;
+          break; // Exit after finding the first match
+        }
+      } else {
+        print('No spreadsheet named "$fileName" found.');
+      }
+    } catch (e) {
+      print('Error searching Google Drive: $e');
+    }
+    return fileId;
   }
 
 }

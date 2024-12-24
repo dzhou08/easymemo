@@ -12,6 +12,7 @@ import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:provider/provider.dart';
 import 'auth_provider.dart';
 import 'env_config.dart';
+import 'util.dart';
 
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
@@ -363,9 +364,17 @@ class _AskingPageState extends State<AskingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<GAuthProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('EasyMemo'),
+        actions: [
+          if ( authProvider.getGoogleUser() != null)
+            ProfilePopupMenu(
+              user: authProvider.getGoogleUser()!,
+              onSignOut: authProvider.signOut,
+            ),
+        ],
       ),
       body: Column(
         children: [
