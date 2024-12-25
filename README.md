@@ -16,7 +16,7 @@ For more resources on Flutter development, view the
 samples, guidance on mobile development, and a full API reference.
 
 # Release to Firebase
-`d`
+`flutter clean`
 `flutter build web`
 `firebase experiments:enable webframeworks`
 `firebase deploy`
