@@ -17,17 +17,23 @@ class CognitiveGamesPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.5, // Set width to 60% of screen width
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-              ),
-              itemCount: 4, // Number of games available
-              itemBuilder: (context, index) {
-                return GameTile(index: index);
-              },
+            width: MediaQuery.of(context).size.width * 0.8, // Set width to 50% of screen width
+            child: Column(
+              children: [
+                Expanded(
+                  child: GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 20,
+                      mainAxisSpacing: 20,
+                    ),
+                    itemCount: 4, // Number of games available
+                    itemBuilder: (context, index) {
+                      return GameTile(index: index);
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -59,10 +65,10 @@ class GameTile extends StatelessWidget {
 
   // Define game routes for navigation
   final List<Widget> gameRoutes = [
-    SDMTPage(), // Replace with actual SDMT test widget
-    StroopPage(), // Replace with actual Stroop test widget
-    MatchingPage(), // Replace with actual memory matching widget
-    PuzzlePage(), // Replace with actual puzzle game widget
+    const SDMTPage(), // Replace with actual SDMT test widget
+    const StroopPage(), // Replace with actual Stroop test widget
+    const MatchingPage(), // Replace with actual memory matching widget
+    const PuzzlePage(), // Replace with actual puzzle game widget
   ];
 
   @override
@@ -91,7 +97,7 @@ class GameTile extends StatelessWidget {
             Text(
               gameTitles[index],
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
           ],
         ),

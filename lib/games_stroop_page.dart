@@ -126,7 +126,7 @@ class _StroopPageState extends State<StroopPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   textStyle: const TextStyle(fontSize: 18),
                 ),
-                child: Text('Restart Game'),
+                child: const Text('Restart Game'),
               ),
             ] else if (_isGameStarted) ...[
               Text(
@@ -156,7 +156,7 @@ class _StroopPageState extends State<StroopPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     textStyle: const TextStyle(fontSize: 18),
                   ),
-                  child: Text('Start Game'),
+                  child: const Text('Start Game'),
                 ),
               ),
             ],

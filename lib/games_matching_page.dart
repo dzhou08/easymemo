@@ -97,7 +97,7 @@ class _MatchingPageState extends State<MatchingPage> {
                   child: _flippedCards[index]
                       ? Text(
                           _revealedCards[index]!,
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         )
                       : Container(),
                 ),

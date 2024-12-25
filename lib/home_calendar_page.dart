@@ -89,7 +89,7 @@ class CalendarPageState extends State<CalendarPage> {
 
     return Scaffold(
       appBar: AppBar(
-      title: Text('EasyMemo'),
+      title: const Text('EasyMemo'),
         actions: [
           if (_user != null)
             ProfilePopupMenu(

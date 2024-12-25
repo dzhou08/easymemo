@@ -7,7 +7,7 @@ class ProfilePopupMenu extends StatelessWidget {
   final VoidCallback onSignOut;
   final GlobalKey _key = GlobalKey();
 
-  ProfilePopupMenu({required this.user, required this.onSignOut});
+  ProfilePopupMenu({super.key, required this.user, required this.onSignOut});
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +17,18 @@ class ProfilePopupMenu extends StatelessWidget {
       },
       child: Container(
         key: _key,
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         child: CircleAvatar(
-          backgroundImage: NetworkImage(user.photoUrl!),
+          child: ClipOval(
+            child: Image.network(
+              user.photoUrl!,
+              headers: const {'crossOrigin': 'anonymous'},
+              fit: BoxFit.cover,
+              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                return const Icon(Icons.error); // You can replace this with any widget you want to display on error
+              },
+            ),
+          ),
         ),
       ),
     );
@@ -38,11 +47,11 @@ class ProfilePopupMenu extends StatelessWidget {
         0,
       ),
       items: [
-        PopupMenuItem<String>(
+        const PopupMenuItem<String>(
           value: 'Profile',
           child: Text('Profile'),
         ),
-        PopupMenuItem<String>(
+        const PopupMenuItem<String>(
           value: 'Logout',
           child: Text('Logout'),
         ),

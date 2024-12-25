@@ -10,6 +10,8 @@ class SDMTPage extends StatefulWidget {
 
 class _SDMTPageState extends State<SDMTPage> {
   final Map<String, String> symbolToDigit = {
+
+    '🍑': '0',
     '🍎': '1',
     '🍌': '2',
     '🍒': '3',
@@ -17,9 +19,8 @@ class _SDMTPageState extends State<SDMTPage> {
     '🍓': '5',
     '🍍': '6',
     '🍊': '7',
-    '🍋': '8',
-    '🍑': '9',
-    '🍒': '0',
+    //'🍋': '8',
+    //'🍒': '0',
   };
 
   List<String> symbols = [];
@@ -87,7 +88,7 @@ class _SDMTPageState extends State<SDMTPage> {
           title: const Text('Enter the number for the symbol'),
           content: Wrap(
             spacing: 10,
-            children: List.generate(10, (number) {
+            children: List.generate(symbols.length, (number) {
               return ChoiceChip(
                 label: Text(
                   number.toString(),
@@ -147,7 +148,9 @@ class _SDMTPageState extends State<SDMTPage> {
             if (isTesting) ...[
               const Text(
                 'Symbol to Number Mapping:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 18, 
+                  fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Wrap(
@@ -156,7 +159,9 @@ class _SDMTPageState extends State<SDMTPage> {
                   return Chip(
                     label: Text(
                       '${entry.key} -> ${entry.value}',
-                      style: const TextStyle(fontSize: 20),
+                      style: const TextStyle
+                      (fontSize: 20,
+                        color: Colors.purple),
                     ),
                   );
                 }).toList(),
@@ -167,7 +172,7 @@ class _SDMTPageState extends State<SDMTPage> {
               Expanded(
                 child: GridView.builder(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 5,
+                    crossAxisCount: 4,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                     childAspectRatio: 1.5,
@@ -177,13 +182,13 @@ class _SDMTPageState extends State<SDMTPage> {
                     return InkWell(
                       onTap: () => _onTileTap(index),
                       child: Card(
-                        color: Colors.blueAccent,
+                        color: Colors.white,
                         child: Center(
                           child: Text(
                             userAnswers[index].isEmpty
                                 ? symbols[index]
                                 : '${symbols[index]} (${userAnswers[index]})',
-                            style: const TextStyle(fontSize: 24, color: Colors.white),
+                            style: const TextStyle(fontSize: 24, color: Colors.purple),
                             textAlign: TextAlign.center,
                           ),
                         ),

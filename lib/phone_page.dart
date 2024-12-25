@@ -27,22 +27,8 @@ class _PhonePageState extends State<PhonePage> {
 
   final bool _isImageFailed = false;
 
-  // Check if the current device is a simulator/emulator
-  /*Future<bool> _isSimulator() async {
-    final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      return iosInfo.isPhysicalDevice == false;
-    }
-    return false;
-  }*/
-
   // Dial the phone number
   void _dialPhoneNumber(String phoneNumber) async {
-    /*if (await _isSimulator()) {
-      print('Cannot make phone calls on an iOS simulator.');
-      return;
-    }*/
     
     final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
     if (await canLaunchUrl(phoneUri)) {
@@ -82,7 +68,6 @@ class _PhonePageState extends State<PhonePage> {
         _googleSheetData = response.body;
         _isLoading = false;
       });
-      //print('Google Sheets Data: ${response.body}');
       // Parse the JSON string
       Map<String, dynamic> jsonData = jsonDecode(response.body);
 
@@ -125,10 +110,6 @@ class _PhonePageState extends State<PhonePage> {
       _readGoogleSheet(token);
     }
 
-    //if (_isLoading) {
-    //  return const Center(child: CircularProgressIndicator());
-    //}
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('EasyMemo'),
@@ -150,8 +131,8 @@ class _PhonePageState extends State<PhonePage> {
             // Get the data from the values list
             String name = values[index][0];        // Access the first column (Name)
             String relationship = values[index][1];    // Access the second column (Relationship)
-            String avatarName = values[index][2];  // Access the third column (Avatar Name)
-            String avatarLink = values[index][3];  // Access the forth column (Avatar Link)
+            String avatarLink = values[index][2];  // Access the forth column (Avatar Link)
+            print(avatarLink);
             // "https://drive.google.com/uc?export=view&id=$fileId";
             //avatarLink = "https://www.w3schools.com/w3images/lights.jpg";
 
@@ -180,14 +161,23 @@ class _PhonePageState extends State<PhonePage> {
                           showInitialTextAbovePicture: false,
                           child: _isImageFailed
                             ? const Icon(Icons.error, size: 50) // Show error if image fails to load
-                            :CachedNetworkImage(
-                              imageUrl: avatarLink,
-                              placeholder: (context, url) => const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) {
+                            :
+                            Image.network(
+                              avatarLink,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) {
+                                  return child;
+                                }
+                                return const CircularProgressIndicator();
+                              },
+                              errorBuilder: (context, error, stackTrace) {
                                 print('Error loading image: $avatarLink $error');
                                 return const Icon(Icons.error, size: 50);
                               },
-                              fit: BoxFit.cover,
+                              headers: const {
+                                'Access-Control-Allow-Origin': '*',
+                              }, // Example of adding headers
                             ),
                         ),
                         const SizedBox(width: 20),  // Add spacing between avatar and details

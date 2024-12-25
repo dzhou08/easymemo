@@ -22,9 +22,12 @@ import 'env_config.dart';
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
 
-import 'package:googleapis/drive/v3.dart';
+import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart';
+import 'dart:typed_data';
 
 
 class StepperPage extends StatefulWidget {
@@ -38,7 +41,7 @@ class StepperPage extends StatefulWidget {
 class _StepperPageState extends State<StepperPage> {
   static GlobalKey resultContainer = GlobalKey();
 
-  String? _imageFilePath;
+  //String? _imageFilePath;
     
   int currentStep = 0;
 
@@ -61,7 +64,9 @@ class _StepperPageState extends State<StepperPage> {
 
   late DrawingController _drawingController;
 
-  Future<void> _initializeImagePath() async {
+  Uint8List? _imageBytes;
+
+  /*Future<void> _initializeImagePath() async {
     final directory = await getApplicationDocumentsDirectory(); // Await the future to get the directory
     final path = directory.path;
 
@@ -76,11 +81,11 @@ class _StepperPageState extends State<StepperPage> {
       await file.delete(); // Asynchronously delete the file
       print('FlutterLetsDraw.png deleted successfully');
     }
-  }
+  }*/
 
   Future<void> _initAsync() async {
     // Initialize the image path asynchronously
-    await _initializeImagePath();
+    //await _initializeImagePath();
     final authProvider = Provider.of<GAuthProvider>(context, listen: false);
     _googleAccessToken = authProvider.getAccessToken();
     _httpClient = authProvider.getAuthClient();
@@ -156,7 +161,7 @@ class _StepperPageState extends State<StepperPage> {
     print(query);
     try
     {
-      var driveApi = DriveApi(_httpClient);
+      var driveApi = drive.DriveApi(_httpClient);//DriveApi(_httpClient);
       // List files in the specified folder
       final fileList = await driveApi.files.list(
         q: query,
@@ -179,12 +184,16 @@ class _StepperPageState extends State<StepperPage> {
 
   Future<void> sendReport() async{
     try {
+
+      print("in sendReport");
+
       // Create a PDF document
+      final font = await PdfGoogleFonts.nunitoExtraLight();
       final pdf = pw.Document();
       pw.MemoryImage? imagePdf;
-      if (_imageFilePath != null && Io.File(_imageFilePath!).existsSync()) {
-        final pngBytes = await Io.File(_imageFilePath!).readAsBytes(); // Read file bytes
-        imagePdf = pw.MemoryImage(pngBytes); // Create a MemoryImage
+      if ( _imageBytes!= null) {
+        //final pngBytes = await Io.File(_imageFilePath!).readAsBytes(); // Read file bytes
+        imagePdf = pw.MemoryImage(_imageBytes!); // Create a MemoryImage
       } else {
         print("Image file does not exist or the path is null");
       }
@@ -199,57 +208,61 @@ class _StepperPageState extends State<StepperPage> {
           build: (pw.Context context) => pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text('$yearDay $hourMin'),
-              pw.Text('Your Mini-Cog diagnose results are listed below:'),
+              pw.Text('$yearDay $hourMin', style: pw.TextStyle(font: font)),
+              pw.Text('Your Mini-Cog diagnose results are listed below:', style: pw.TextStyle(font: font)),
               pw.Divider(
                 thickness: 4,
                 color: PdfColors.deepPurple,
               ),
-              pw.Text('Word Recall'),
-              pw.Text("The original three words are: ${_threeWordsInitSet.join(', ')}"),
-              pw.Text("You said:${_threeWordsRepeatSet.join(', ')}"),
-              pw.Text("Your score is: $_wordRecallPoints out of 3."),
+              pw.Text('Word Recall', style: pw.TextStyle(font: font)),
+              pw.Text("The original three words are: ${_threeWordsInitSet.join(', ')}", style: pw.TextStyle(font: font)),
+              pw.Text("You said:${_threeWordsRepeatSet.join(', ')}", style: pw.TextStyle(font: font)),
+              pw.Text("Your score is: $_wordRecallPoints out of 3.", style: pw.TextStyle(font: font)),
               pw.Divider(
                 thickness: 4,
                 color: PdfColors.deepPurple,
               ),
-              pw.Text("Clock Draw Points: $_clockDrawingPoints out of 2"),
+              pw.Text("Clock Draw Points: $_clockDrawingPoints out of 2", style: pw.TextStyle(font: font)),
               pw.Image(
                 imagePdf!,
                 width: 400, // Set the desired width
                 height: 200, // Set the desired height
               fit: pw.BoxFit.contain, ),
-              pw.Text("Clock Draw feedback:"),
-              pw.Text(_clockDrawingFeedback),
+              pw.Text("Clock Draw feedback:", style: pw.TextStyle(font: font)),
+              pw.Text(_clockDrawingFeedback, style: pw.TextStyle(font: font)),
               pw.Divider(
                 thickness: 4,
                 color: PdfColors.deepPurple,
               ),
-              pw.Text("Total score: ${_wordRecallPoints+_clockDrawingPoints}"),
+              pw.Text("Total score: ${_wordRecallPoints+_clockDrawingPoints}", style: pw.TextStyle(font: font)),
             ]
           )
         )
       );
 
-      // Save the PDF to a file
-      final appDir = await getTemporaryDirectory();
-      final pdfFile = Io.File('${appDir.path}/output.pdf');
-      await pdfFile.writeAsBytes(await pdf.save());
-      print('PDF created');
-
+      // Convert the PDF document to bytes
+      final pdfBytes = await pdf.save();
 
       // get local path
       final driveFolderId = await _getGoogleFolderByName(_googleAccessToken.toString(), 'minicog_reports_folder');
       print(driveFolderId);
       
-      var driveApi = DriveApi(_httpClient);
-      final fileToUpload = File()
-      ..name = 'MiniCog_report_$timestampFileName.pdf'
-      ..parents = [driveFolderId!];
+      var driveApi = drive.DriveApi(_httpClient);
+      // Prepare the file metadata
+      var fileToUpload = drive.File()
+        ..name = 'MiniCog_report_$timestampFileName.pdf'
+        ..parents = [driveFolderId!]; // You can change this to your specific folder ID if needed
 
+      // Create a media object for uploading
+      final media = drive.Media(
+        Stream.fromIterable([pdfBytes]),
+        pdfBytes.length,
+      );
+
+      // Upload the PDF to Google Drive
       final uploadResponse = await driveApi.files.create(
         fileToUpload,
-        uploadMedia: Media(pdfFile.openRead(), pdfFile.lengthSync()),
+        uploadMedia: media,
       );
 
       print('File uploaded successfully! File ID: ${uploadResponse.id}');
@@ -309,11 +322,11 @@ class _StepperPageState extends State<StepperPage> {
 
   String chatGPTResponse = "";
 
-  Future<void> openAICalling(String path) async {
+  Future<void> openAICalling() async {
     // Open the image file and encode it as a base64 string
-    final bytes = Io.File(path).readAsBytesSync();
+    //final bytes = Io.File(path).readAsBytesSync();
 
-    String base64Image = base64Encode(bytes);
+    String base64Image = base64Encode(_imageBytes!);
     String imageAnalysisInstruction = """
               Help me to analyze a png image file. Does it contain a norml clock?
               A normal clock has all numbers placed in the correct sequence and approximately correct position.
@@ -458,17 +471,16 @@ class _StepperPageState extends State<StepperPage> {
                     Html(
                         data: "<span style='color: purple;'><b>Clock Draw:</b>"
                     ),
-                    if (_imageFilePath == null)
+                    if (_imageBytes == null)
                       const CircularProgressIndicator() // Show a loading indicator while waiting for initialization
-                    else if (_imageFilePath != null && Io.File(_imageFilePath!).existsSync())
-                      Image.file(
-                        Io.File(_imageFilePath!),
-                        key: UniqueKey(), 
-                        width: 250,
-                        height: 250,
-                      )
+                    else if (_imageBytes != null)
+                      Image.memory(
+                        _imageBytes!,
+                        width: 200, // Set the width to 200 pixels
+                        height: 150, // Set the height to 150 pixels
+                        fit: BoxFit.cover) // Adjust the content within the specified dimensions)
                     else
-                      Text('No image found at the specified path $_imageFilePath'),
+                      const Text('No image found at the specified path'),
                     Html(
                       data: "Clock Draw Points:</b> $_clockDrawingPoints out of 2",
                     ),
@@ -552,37 +564,15 @@ class _StepperPageState extends State<StepperPage> {
       // Wait for the current frame to complete before exporting the image
       WidgetsBinding.instance.addPostFrameCallback((_) async {
 
-        // Step 1: delete previous data file
-        final file = Io.File(_imageFilePath!);
-
-        // Delete the file if it exists
-        if (await file.exists()) {
-          print('FlutterLetsDraw.png to be deleted');
-          await file.delete();
-          print('FlutterLetsDraw.png deleted successfully');
-        }
-
-        // Step 2: Get the image data from the drawing controller
-        final image = (await _drawingController.getImageData())?.buffer.asUint8List();
-        if (image == null) {
+        // Get the image data from the drawing controller
+        _imageBytes = (await _drawingController.getImageData())?.buffer.asUint8List();
+        if (_imageBytes == null) {
           print('No image data');
           return;
         }
-        print("has data");
-
-        // Write the new image data to the file
-        String newImageFilePath = _imageFilePath! + DateTime.now().millisecondsSinceEpoch.toString();
-        await Io.File(newImageFilePath).writeAsBytes(image, flush: true);
-        print('File saved at $newImageFilePath');
-
-        // Trigger a rebuild to update the displayed image
-        setState(() {
-          // Optionally update _imageFilePath if the path changes
-          _imageFilePath = newImageFilePath;
-        });
 
         // Optionally call OpenAI API to analyze the image
-        openAICalling(_imageFilePath!);
+        openAICalling();
       });  
     } catch (e) {
       print('Error saving file: $e');

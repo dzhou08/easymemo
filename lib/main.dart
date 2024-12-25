@@ -1,5 +1,6 @@
 
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +10,7 @@ import 'auth_provider.dart';
 
 import 'my_app_state.dart';
 import 'phone_page.dart';
-import 'stepper_page.dart';
+import 'mini_cog.dart';
 import 'asking_page.dart';
 import 'games_page.dart';
 
@@ -81,6 +82,15 @@ class MyApp extends StatelessWidget {
       create: (context) => MyAppState(), 
       // we use `builder` to obtain a new `BuildContext` that has access to the provider
       builder: (context, child) {
+      // Initialize pointer handling logic
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        GestureBinding.instance.pointerRouter.addGlobalRoute((event) {
+          if (event.kind == PointerDeviceKind.trackpad) {
+            // Handle trackpad gestures here or log them
+            //debugPrint('Trackpad gesture detected: $event');
+          }
+        });
+      });
       return MaterialApp(
           title: 'EasyMemo App',
           theme: ThemeData(
