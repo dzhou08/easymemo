@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 // For platform checks
 import 'dart:convert';  // Import for JSON parsing
 import 'package:cached_network_image/cached_network_image.dart';
-
+import 'dart:typed_data';
 
 
 class PhonePage extends StatefulWidget {
@@ -101,6 +101,21 @@ class _PhonePageState extends State<PhonePage> {
     throw Exception('Invalid Google Drive URL');
   }
 
+  Future<Uint8List?> _loadNetworkImage(url) async {
+    Uint8List? _imageData;
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        _imageData = response.bodyBytes; // This is the Uint8List data
+      } else {
+        debugPrint('Failed to load image: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error loading image: $e');
+    }
+    return _imageData;
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<GAuthProvider>(context);
@@ -159,26 +174,30 @@ class _PhonePageState extends State<PhonePage> {
                           elevation: 5.0,
                           cacheImage: false,
                           showInitialTextAbovePicture: false,
-                          child: _isImageFailed
-                            ? const Icon(Icons.error, size: 50) // Show error if image fails to load
-                            :
-                            Image.network(
-                              avatarLink,
-                              fit: BoxFit.cover,
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                }
+                          child: FutureBuilder<Uint8List?>(
+                            future: _loadNetworkImage(avatarLink), // Load the image asynchronously
+                            builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                // Show a loading indicator while waiting for the image
                                 return const CircularProgressIndicator();
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                print('Error loading image: $avatarLink $error');
-                                return const Icon(Icons.error, size: 50);
-                              },
-                              headers: const {
-                                'Access-Control-Allow-Origin': '*',
-                              }, // Example of adding headers
-                            ),
+                              } else if (snapshot.hasError) {
+                                // Show an error icon if there was an error fetching the image
+                                return const Icon(Icons.error);
+                              } else if (snapshot.hasData) {
+                                // Display the image when data is available
+                                return Image.memory(
+                                  snapshot.data!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                    return const Icon(Icons.error); // Handle image rendering errors
+                                  },
+                                );
+                              } else {
+                                // Fallback for unexpected cases
+                                return const Icon(Icons.person); // Placeholder for no data
+                              }
+                            },
+                          ),
                         ),
                         const SizedBox(width: 20),  // Add spacing between avatar and details
                         Expanded(
