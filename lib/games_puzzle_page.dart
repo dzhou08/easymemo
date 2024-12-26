@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'util.dart';
 
 class PuzzlePage extends StatefulWidget {
   const PuzzlePage({super.key});
@@ -35,6 +36,9 @@ class _PuzzlePageState extends State<PuzzlePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Image Grid Puzzle'),
+        actions: [
+          ProfilePopupMenu(),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),

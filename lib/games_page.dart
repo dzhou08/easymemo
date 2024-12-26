@@ -5,6 +5,7 @@ import 'games_sdmt_page.dart';
 import 'games_stroop_page.dart';
 import 'games_puzzle_page.dart';
 import 'games_matching_page.dart';
+import 'util.dart';
 
 class CognitiveGamesPage extends StatelessWidget {
   const CognitiveGamesPage({super.key});
@@ -12,7 +13,11 @@ class CognitiveGamesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Cognitive Games')),
+      appBar: AppBar(
+        title: const Text('Cognitive Games'),
+        actions: [
+          ProfilePopupMenu(),
+        ],),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(

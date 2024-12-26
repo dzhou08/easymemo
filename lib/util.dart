@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePopupMenu extends StatelessWidget {
-  final GoogleSignInAccount user;
-  final VoidCallback onSignOut;
+  late GoogleSignInAccount user;
   final GlobalKey _key = GlobalKey();
-
-  ProfilePopupMenu({super.key, required this.user, required this.onSignOut});
+  late GAuthProvider authProvider;
+  late VoidCallback onSignOut;
 
   Future<Uint8List?> _loadNetworkImage(url) async {
     Uint8List? _imageData;
@@ -27,10 +28,14 @@ class ProfilePopupMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    final authProvider = Provider.of<GAuthProvider>(context);
+    final user = authProvider.getGoogleUser();
+    if (user == null) {
+      return const SizedBox.shrink();
+    }
     return GestureDetector(
       onTap: () {
-        _showPopupMenu(context);
+        _showPopupMenu(context, authProvider.signOut);
       },
       child: Container(
         key: _key,
@@ -67,7 +72,7 @@ class ProfilePopupMenu extends StatelessWidget {
     );
   }
 
-  void _showPopupMenu(BuildContext context) {
+  void _showPopupMenu(BuildContext context, VoidCallback signOut) {
     final RenderBox renderBox = _key.currentContext!.findRenderObject() as RenderBox;
     final Offset offset = renderBox.localToGlobal(Offset.zero);
 
@@ -91,7 +96,7 @@ class ProfilePopupMenu extends StatelessWidget {
       ],
     ).then((value) {
       if (value == 'Logout') {
-        onSignOut();
+        signOut();
       }
     });
   }

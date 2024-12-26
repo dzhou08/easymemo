@@ -91,11 +91,7 @@ class CalendarPageState extends State<CalendarPage> {
       appBar: AppBar(
       title: const Text('EasyMemo'),
         actions: [
-          if (_user != null)
-            ProfilePopupMenu(
-              user: _user!,
-              onSignOut: authProvider.signOut,
-            ),
+          ProfilePopupMenu(),
         ],
       ),
       body: Column(

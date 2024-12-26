@@ -367,13 +367,9 @@ class _AskingPageState extends State<AskingPage> {
     final authProvider = Provider.of<GAuthProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EasyMemo'),
+        title: const Text('Ask Me Anything'),
         actions: [
-          if ( authProvider.getGoogleUser() != null)
-            ProfilePopupMenu(
-              user: authProvider.getGoogleUser()!,
-              onSignOut: authProvider.signOut,
-            ),
+          ProfilePopupMenu(),
         ],
       ),
       body: Column(

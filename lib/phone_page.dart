@@ -4,6 +4,8 @@ import 'package:url_launcher/url_launcher.dart';
 //import 'package:device_info_plus/device_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'auth_provider.dart';
+import 'util.dart';
+
 import 'package:http/http.dart' as http;
 // For platform checks
 import 'dart:convert';  // Import for JSON parsing
@@ -128,6 +130,9 @@ class _PhonePageState extends State<PhonePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('EasyMemo'),
+        actions: [
+          ProfilePopupMenu(),
+        ],
       ),
       body: NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) {

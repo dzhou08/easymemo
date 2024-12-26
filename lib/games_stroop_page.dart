@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'util.dart';
 
 class StroopPage extends StatefulWidget {
   const StroopPage({super.key});
@@ -98,6 +99,9 @@ class _StroopPageState extends State<StroopPage> {
       appBar: AppBar(
         title: const Text('Stroop Test'),
         centerTitle: true,
+        actions: [
+          ProfilePopupMenu(),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

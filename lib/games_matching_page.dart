@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'util.dart';
 
 class MatchingPage extends StatefulWidget {
   const MatchingPage({super.key});
@@ -76,6 +77,9 @@ class _MatchingPageState extends State<MatchingPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Memory Matching Game'),
+        actions: [
+          ProfilePopupMenu(),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),

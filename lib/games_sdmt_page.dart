@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'util.dart';
 
 class SDMTPage extends StatefulWidget {
   const SDMTPage({super.key});
@@ -124,7 +125,11 @@ class _SDMTPageState extends State<SDMTPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Symbol Digit Modalities Test')),
+      appBar: AppBar(
+        title: const Text('Symbol Digit Modalities Test'),
+        actions: [
+          ProfilePopupMenu(),
+        ],),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

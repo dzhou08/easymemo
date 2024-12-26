@@ -19,6 +19,7 @@ import 'package:provider/provider.dart';
 import 'auth_provider.dart';
 import 'package:intl/intl.dart';
 import 'env_config.dart';
+import 'util.dart';
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -28,6 +29,7 @@ import 'package:printing/printing.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart';
 import 'dart:typed_data';
+
 
 
 class StepperPage extends StatefulWidget {
@@ -610,7 +612,10 @@ class _StepperPageState extends State<StepperPage> {
         key: resultContainer,
         child: Scaffold (
       appBar: AppBar(
-        title: const Text('EasyMemo'),
+      title: const Text('Mini-Cog™ Test'),
+        actions: [
+          ProfilePopupMenu(),
+        ],
       ),
       body: isComplete
         ? buildResultPage (_clockDrawingPoints/2.toDouble())
