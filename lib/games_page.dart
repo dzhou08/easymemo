@@ -6,6 +6,8 @@ import 'games_stroop_page.dart';
 import 'games_puzzle_page.dart';
 import 'games_matching_page.dart';
 import 'util.dart';
+import 'package:flutter/foundation.dart';
+
 
 class CognitiveGamesPage extends StatelessWidget {
   const CognitiveGamesPage({super.key});
@@ -22,7 +24,8 @@ class CognitiveGamesPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.8, // Set width to 50% of screen width
+            width: 
+            kIsWeb ? MediaQuery.of(context).size.width * 0.4:MediaQuery.of(context).size.width * 0.8, // Set width to 50% of screen width
             child: Column(
               children: [
                 Expanded(

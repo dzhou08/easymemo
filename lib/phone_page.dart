@@ -47,7 +47,7 @@ class _PhonePageState extends State<PhonePage> {
     }
 
     final authProvider = Provider.of<GAuthProvider>(context, listen: false);
-    String? spreadsheetId = await authProvider.findGoogleSheetByName("contacts");//'1BDvsJVw3bffGMuRsKDyJHACDIBT9HOgcUDNdBqu_RXs';
+    String? spreadsheetId = await authProvider.findGoogleSheetByName("contacts");
     if (spreadsheetId == null)
     {
       print('Google Sheet not found');
@@ -129,7 +129,7 @@ class _PhonePageState extends State<PhonePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EasyMemo'),
+        title: const Text('Contacts'),
         actions: [
           ProfilePopupMenu(),
         ],

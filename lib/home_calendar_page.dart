@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'auth_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-
-import 'auth_provider.dart';
 import 'home_date_display.dart';
 import 'util.dart';
 
