@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'util.dart';
+import 'package:provider/provider.dart';
+import 'auth_provider.dart';
 
 class StroopPage extends StatefulWidget {
   const StroopPage({super.key});
@@ -81,6 +83,7 @@ class _StroopPageState extends State<StroopPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<GAuthProvider>(context, listen: false);
     // Generate buttons using the shuffled color names
     List<Widget> buttons = _shuffledColorNames.map((colorName) {
       return ElevatedButton(
@@ -110,7 +113,7 @@ class _StroopPageState extends State<StroopPage> {
           children: [
             // Persistent instructions
             const Text(
-              'In this test, you will be shown a word displayed in a specific color. Your task is to identify the color of the text, not the word itself. Tap the button that matches the color of the word.',
+              'In this test, you will be shown a word displayed in a specific color. \n Your task is to identify the color of the text, not the word itself. \nTap the button that matches the color of the word.',
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
             ),
@@ -124,13 +127,26 @@ class _StroopPageState extends State<StroopPage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _startGame,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  textStyle: const TextStyle(fontSize: 18),
-                ),
-                child: const Text('Restart Game'),
+              const SizedBox(height: 20),
+              Row (
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      await authProvider.reportGameScore('stroop', _score);
+                    },
+                    child: const Text('Record Score'),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _startGame,
+                    /*style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      textStyle: const TextStyle(fontSize: 18),
+                    ),*/
+                    child: const Text('Restart Game'),
+                  ),
+                ]
               ),
             ] else if (_isGameStarted) ...[
               Text(
@@ -145,6 +161,7 @@ class _StroopPageState extends State<StroopPage> {
               const SizedBox(height: 20),
               Wrap(
                 spacing: 10,
+                alignment: WrapAlignment.center,
                 children: buttons,
               ),
               const SizedBox(height: 20),

@@ -374,7 +374,7 @@ class _AskingPageState extends State<AskingPage> {
       ),
       body: Column(
         children: [
-                    Padding(
+          Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               mainAxisSize: MainAxisSize.min, // Makes the button width fit the content
@@ -413,7 +413,7 @@ class _AskingPageState extends State<AskingPage> {
                     ],
                   ),
                 ),
-                const SizedBox(width: 15),
+                /*const SizedBox(width: 15),
                 ElevatedButton(
                   onPressed: _clearQuestion,  // Call the clear function to clear question
                   child: Row(
@@ -430,7 +430,7 @@ class _AskingPageState extends State<AskingPage> {
                       const Text('Clear Questions'),
                     ],
                   ),
-                ),
+                ),*/
               ]
             )
           ),

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'util.dart';
 import 'package:provider/provider.dart';
 import 'auth_provider.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 class SDMTPage extends StatefulWidget {
   const SDMTPage({super.key});
@@ -218,107 +217,6 @@ class _SDMTPageState extends State<SDMTPage> {
                   ElevatedButton(
                     onPressed: _startTest,
                     child: const Text('Start Test'),
-                  ),
-                  const SizedBox(height: 40),
-                  Text('View the Test Score Trend'),
-                  const SizedBox(height: 20),
-                  // draw a scatter chart to show the score trend
-                  // Placeholder for the chart
-                  Container(
-                    height: 400,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: FutureBuilder<List<List<dynamic>>>(
-                      future: authProvider.readGameScore("sdmt"),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
-                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return Center(child: Text('No data available'));
-                        } else {
-                          List<List<dynamic>> testResults = snapshot.data!;
-
-                          // Group scores by month and calculate frequency within each month
-                          Map<int, Map<double, int>> monthlyScoreFrequency = {};
-                          for (var entry in testResults) {
-                            DateTime dateTime = DateTime.parse(entry[0]);
-                            int month = dateTime.month;
-                            double score = double.parse(entry[2]);
-
-                            if (!monthlyScoreFrequency.containsKey(month)) {
-                              monthlyScoreFrequency[month] = {};
-                            }
-
-                            if (monthlyScoreFrequency[month]!.containsKey(score)) {
-                              monthlyScoreFrequency[month]![score] = monthlyScoreFrequency[month]![score]! + 1;
-                            } else {
-                              monthlyScoreFrequency[month]![score] = 1;
-                            }
-                          }
-                          
-                          return Center(
-                            child: ScatterChart(
-                              ScatterChartData(
-                                scatterTouchData: ScatterTouchData(enabled: true),
-                                gridData: FlGridData(show: true),
-                                titlesData: FlTitlesData(
-                                  leftTitles: AxisTitles(
-                                    sideTitles: SideTitles(
-                                      showTitles: true,
-                                      getTitlesWidget: (value, meta) {
-                                        return Text(
-                                          value.toInt().toString(),
-                                          style: const TextStyle(fontSize: 10),
-                                        );
-                                      },
-                                    ),
-                                    axisNameWidget: const Text('Score'),
-                                  ),
-                                  bottomTitles: AxisTitles(
-                                    sideTitles: SideTitles(
-                                      showTitles: true,
-                                      getTitlesWidget: (value, meta) {
-                                        // Map numbers 1-12 to the respective month names
-                                        List<String> monthNames = [
-                                          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-                                        ];
-                                        int monthIndex = value.toInt() - 1; // Convert 1-12 to index 0-11
-                                        return Text(
-                                          monthNames[monthIndex],
-                                          style: const TextStyle(fontSize: 10),
-                                        );
-                                      },
-                                      // Ensure we display only one title per month (1, 2, ..., 12)
-                                      interval: 1, // Only one tick per month
-                                    ),
-                                    axisNameWidget: const Text('Month'),
-                                  ),
-                                  topTitles: AxisTitles(
-                                    sideTitles: SideTitles(showTitles: false), // Hide top titles
-                                  ),
-                                ),
-                                borderData: FlBorderData(show: true),
-                                scatterSpots: testResults.map((entry) {
-                                  DateTime dateTime = DateTime.parse(entry[0]);
-                                  double month = dateTime.month.toDouble();
-                                  double score = double.parse(entry[2]);
-                                  return ScatterSpot(month, score);
-                                }).toList(),
-                                minX: 1,  // Set minimum value for the x-axis (month)
-                                maxX: 12, // Set maximum value for the x-axis (month)
-                                minY: 0,  // Set minimum value for the y-axis (score)
-                                maxY: 8,  // Set maximum value for the y-axis (score)
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                    ),
                   ),
                 ],
               ),

@@ -32,15 +32,15 @@ import 'dart:typed_data';
 
 
 
-class StepperPage extends StatefulWidget {
-  const StepperPage({super.key});
+class MiniCogPage extends StatefulWidget {
+  const MiniCogPage({super.key});
 
   @override
-  State<StepperPage> createState() =>
-      _StepperPageState();
+  State<MiniCogPage> createState() =>
+      _MiniCogPageState();
 }
 
-class _StepperPageState extends State<StepperPage> {
+class _MiniCogPageState extends State<MiniCogPage> {
   static GlobalKey resultContainer = GlobalKey();
 
   //String? _imageFilePath;
@@ -188,6 +188,10 @@ class _StepperPageState extends State<StepperPage> {
     try {
 
       print("in sendReport");
+
+      // first, send score report to the scores spreadsheet
+      final authProvider = Provider.of<GAuthProvider>(context, listen: false);
+      authProvider.reportGameScore('mini-cog', _wordRecallPoints+_clockDrawingPoints);
 
       // Create a PDF document
       final font = await PdfGoogleFonts.nunitoExtraLight();

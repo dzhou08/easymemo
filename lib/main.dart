@@ -10,7 +10,6 @@ import 'auth_provider.dart';
 
 import 'my_app_state.dart';
 import 'phone_page.dart';
-import 'mini_cog.dart';
 import 'asking_page.dart';
 import 'games_page.dart';
 
@@ -190,16 +189,13 @@ class _MyHomePageState extends State<MyHomePage> {
         page = CalendarPage();
         break;
       case 1:
-        page = StepperPage();
+        page = CognitiveGamesPage();
         break;
       case 2:
         page = PhonePage();
         break;
       case 3:
         page = AskingPage();
-        break;
-      case 4:
-        page = CognitiveGamesPage();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -278,8 +274,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 label: 'Home',
                               ),
                               BottomNavigationBarItem(
-                                icon: Icon(Icons.medical_information),
-                                label: 'Mini-Cog™',
+                                icon: Icon(Icons.games),
+                                label: 'Games',
                               ),
                               BottomNavigationBarItem(
                                 icon: Icon(Icons.phone),
@@ -288,10 +284,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               BottomNavigationBarItem(
                                 icon: Icon(Icons.mic),
                                 label: 'Ask Me!',
-                              ),
-                              BottomNavigationBarItem(
-                                icon: Icon(Icons.games),
-                                label: 'Games',
                               ),
                             ],
                             currentIndex: selectedIndex,
@@ -364,8 +356,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     label: Text('Home'),
                                   ),
                                   NavigationRailDestination(
-                                    icon: Icon(Icons.medical_information),
-                                    label: Text('Mini-Cog™'),
+                                    icon: Icon(Icons.games),
+                                    label: Text('Games'),
                                   ),
                                   NavigationRailDestination(
                                     icon: Icon(Icons.phone),
@@ -374,10 +366,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                   NavigationRailDestination(
                                     icon: Icon(Icons.mic),
                                     label: Text('Ask Me!'),
-                                  ),
-                                  NavigationRailDestination(
-                                    icon: Icon(Icons.games),
-                                    label: Text('Games'),
                                   ),
                                 ],
                                 selectedIndex: selectedIndex,
