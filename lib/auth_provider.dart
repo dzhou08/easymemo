@@ -1,12 +1,14 @@
 
+import 'dart:math';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';  // Import for JSON parsing
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:googleapis/sheets/v4.dart' as sheets;
-import 'package:googleapis_auth/auth_io.dart';
 
 
 class GAuthProvider with ChangeNotifier {
@@ -14,20 +16,113 @@ class GAuthProvider with ChangeNotifier {
     scopes: [
       'https://www.googleapis.com/auth/spreadsheets.readonly',
       'https://www.googleapis.com/auth/calendar.readonly',
-      //'https://www.googleapis.com/auth/drive.readonly',
       'https://www.googleapis.com/auth/drive',
       'https://www.googleapis.com/auth/drive.appdata',
       'https://www.googleapis.com/auth/drive.appfolder',
       'https://www.googleapis.com/auth/drive.file',
+      'https://www.googleapis.com/auth/documents.readonly',
       'https://www.googleapis.com/auth/drive.resource',
-      'email',
     ],
   );
 
   GoogleSignInAccount? _user;
   GoogleSignInAuthentication? _googleAuth;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  late Client httpClient;
+  late http.Client httpClient;
+
+  
+  // Function to get Google Doc content by file ID
+  Future<String?> getGoogleDocContent(String fileId, String accessToken, bool randomLineOnly) async {
+    final response = await http.get(
+        Uri.parse('https://docs.googleapis.com/v1/documents/$fileId'),      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      final content = parseGoogleDocContent(jsonData, randomLineOnly);
+      return content;
+    } else {
+      print('Failed to fetch Google Doc content: ${response.statusCode}');
+      return null;
+    }
+  }
+
+  String parseGoogleDocContent(Map<String, dynamic> jsonData, bool randomLineOnly) {
+  final body = jsonData['body'];
+  final content = body['content'];
+  final lines = <String>[];
+
+  for (var element in content) {
+    if (element.containsKey('paragraph')) {
+      final paragraph = element['paragraph'];
+      final elements = paragraph['elements'];
+      for (var elem in elements) {
+        if (elem.containsKey('textRun')) {
+          final textRun = elem['textRun'];
+          final text = textRun['content'].trim();
+          if (text.isNotEmpty) {
+            lines.add(text);
+          }
+        }
+      }
+    }
+  }
+
+  if (lines.isNotEmpty) {
+    if (randomLineOnly) {
+      final randomIndex = Random().nextInt(lines.length);
+      return lines[randomIndex];
+    } else {
+      return lines.join('\n');
+    }
+  } else {
+    return 'No content found';
+  }
+}
+
+  // Function to search files by name
+  Future<String?> searchFilesByName(String accessToken, String fileName, bool randomLineOnly) async {
+
+    // Google Drive API search query to search for a file by name
+    //final query = "name contains '$fileName'";
+    final query = "name='$fileName' and mimeType='application/vnd.google-apps.document' and trashed=false";
+    try
+    {
+      final response = await http.get(
+        Uri.parse('https://www.googleapis.com/drive/v3/files?q=$query&fields=files(id, name, mimeType)'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        
+        Map<String, dynamic> jsonData = jsonDecode(response.body);
+        print(jsonData);
+        // Access the "values" key, which is a list of lists
+        List<dynamic> jsonValues = jsonData['files'];
+        // only need the first element and get the id value
+        final String fileId = jsonValues[0]['id'];
+        final content = await getGoogleDocContent(fileId, accessToken, randomLineOnly);
+        if (content != null) {
+          print('File Content: $content');
+        } else {
+          print('Failed to fetch file content');
+        }
+        print(content);
+        return content;
+      }
+    }
+    catch (error) {
+      // Stop further execution if an error occurs
+      print("Error caught: $error");
+      return null;
+    }
+    return null;
+  }
 
   // Sign in with Google and obtain access token
   Future<void> signInWithGoogle() async {
@@ -76,8 +171,37 @@ class GAuthProvider with ChangeNotifier {
     return _user != null;
   }
 
-  Client getAuthClient() {
+  http.Client getAuthClient() {
     return httpClient;
+  }
+
+  Future<Uint8List?> getGoogleImageFileContent(String fileUrl) async {
+    String fileId = '';
+
+    final uri = Uri.parse(fileUrl);
+    final segments = uri.pathSegments;
+    if (segments.length > 2 && segments[1] == 'd') {
+      fileId = segments[2];
+    } else {
+      throw FormatException('Invalid Google Drive file URL');
+    }
+
+    final driveApi = drive.DriveApi(httpClient);
+
+    try {
+      final media = await driveApi.files.get(
+        fileId, 
+        downloadOptions: drive.DownloadOptions.fullMedia) as drive.Media;
+      final List<int> bytes = [];
+      await for (var chunk in media.stream) {
+        bytes.addAll(chunk);
+      }
+      return Uint8List.fromList(bytes);
+    } catch (e) {
+      print('Failed to fetch file content: $e');
+      return null;
+    } finally {
+    }
   }
 
   Future<String?> reportGameScore(String gameName, int score) async {

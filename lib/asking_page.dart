@@ -63,19 +63,23 @@ class _AskingPageState extends State<AskingPage> {
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
     final authProvider = Provider.of<GAuthProvider>(context);
     final token = authProvider.getAccessToken();
 
     if (token != null) {
-      _searchFilesByName(token, 'memo');
+      final content = await authProvider.searchFilesByName(token, 'memo', false);
+      setState(() {
+        _fileContent = content;
+      });
     }
   }
 
   @override
   void initState() {
     super.initState();
+    
     _speech = stt.SpeechToText();
   }
 
@@ -104,97 +108,6 @@ class _AskingPageState extends State<AskingPage> {
   void _stopListening() {
     setState(() => _isListening = false);
     _speech.stop();
-  }
-
-
-  ///
-  /// get Google file content by id
-  ///
-
-  Future<String?> getFileContent(String fileId, String accessToken) async {
-    final url = 'https://www.googleapis.com/drive/v3/files/$fileId?alt=media';
-    print(url);
-
-    try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization':  'Bearer $accessToken',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        // Successfully retrieved the file content
-        return response.body; // This will return the content of the file
-      } else {
-        print('Failed to retrieve file content. Status code: ${response.statusCode}');
-        return null;
-      }
-    } catch (error) {
-      print('Error fetching file content: $error');
-      return null;
-    }
-  }
-
-  // Function to search files by name
-  Future<String?> _searchFilesByName(String accessToken, String fileName) async {
-
-    // Google Drive API search query to search for a file by name
-    final query = "name contains '$fileName'";
-    try
-    {
-      final response = await http.get(
-        Uri.parse('https://www.googleapis.com/drive/v3/files?q=$query&fields=files(id, name, mimeType)'),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        //final Map<String, dynamic> data = jsonDecode(response.body);
-        // Parse the JSON string
-        /*
-        "files": [
-            {
-              "mimeType": "text/plain",
-              "id": "15bbpwJfWt6ezuxOqXP2TsW9xnuMSm9A3",
-              "name": "memo.txt"
-            }
-          ]
-        */
-        Map<String, dynamic> jsonData = jsonDecode(response.body);
-
-        // Access the "values" key, which is a list of lists
-        List<dynamic> jsonValues = jsonData['files'];
-        // only need the first element and get the id value
-        final String fileId = jsonValues[0]['id'];
-        final content = await getFileContent(fileId, accessToken);
-        if (content != null) {
-          print('File Content: $content');
-        } else {
-          print('Failed to fetch file content');
-        }
-
-        if (mounted) {
-          setState(() {
-            _fileContent = content;
-            _isLoading = false;
-          });
-        }
-        return content;
-      }
-    }
-    catch (error) {
-      // Stop further execution if an error occurs
-      print("Error caught: $error");
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-      return null;
-    }
-    return null;
   }
 
   Future<void> sendToGPT(String message) async {
@@ -276,9 +189,9 @@ class _AskingPageState extends State<AskingPage> {
           print("No valid response received.");
         }
       } catch (e) {
-      // Handle any exceptions that may occur during the process
-      print("Error occurred: $e");
-    }
+        // Handle any exceptions that may occur during the process
+        print("Error occurred: $e");
+      }
     }
     else
     {

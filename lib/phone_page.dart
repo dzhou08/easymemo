@@ -103,21 +103,6 @@ class _PhonePageState extends State<PhonePage> {
     throw Exception('Invalid Google Drive URL');
   }
 
-  Future<Uint8List?> _loadNetworkImage(url) async {
-    Uint8List? _imageData;
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        _imageData = response.bodyBytes; // This is the Uint8List data
-      } else {
-        debugPrint('Failed to load image: ${response.statusCode}');
-      }
-    } catch (e) {
-      debugPrint('Error loading image: $e');
-    }
-    return _imageData;
-  }
-
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<GAuthProvider>(context);
@@ -180,7 +165,7 @@ class _PhonePageState extends State<PhonePage> {
                           cacheImage: false,
                           showInitialTextAbovePicture: false,
                           child: FutureBuilder<Uint8List?>(
-                            future: _loadNetworkImage(avatarLink), // Load the image asynchronously
+                            future: authProvider.getGoogleImageFileContent(avatarLink), // Load the image asynchronously
                             builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 // Show a loading indicator while waiting for the image

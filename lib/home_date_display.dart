@@ -24,14 +24,7 @@ class _DateDisplayState extends State<DateDisplay> {
       _logger.info('${rec.level.name}: ${rec.time}: ${rec.message}');
     });
   }
-
-    @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final authProvider = Provider.of<GAuthProvider>(context);
-    final String? token = authProvider.getAccessToken();
-
-  }
+  
   @override
   void initState() {
     super.initState();
