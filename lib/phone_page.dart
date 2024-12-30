@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:url_launcher/url_launcher.dart';
-//import 'package:device_info_plus/device_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'auth_provider.dart';
 import 'util.dart';
@@ -23,7 +22,6 @@ class PhonePage extends StatefulWidget {
 class _PhonePageState extends State<PhonePage> {
   final _key = GlobalKey();
   bool _isLoading = true;
-  String? _googleSheetData;
   String? token;
   List<dynamic> values = []; // To store the fetched Google Sheet data
 
@@ -40,58 +38,26 @@ class _PhonePageState extends State<PhonePage> {
     }
   }
 
-  // Read Google Sheet data
-  Future<void> _readGoogleSheet(String accessToken) async {
-    if (values.isNotEmpty) {
-      return;
-    }
-
-    final authProvider = Provider.of<GAuthProvider>(context, listen: false);
-    String? spreadsheetId = await authProvider.findGoogleSheetByName("contacts");
-    if (spreadsheetId == null)
-    {
-      print('Google Sheet not found');
-      return;
-    }
-
-    // found the spreadsheet, now get the data
-    String range = 'Sheet1!A1:D7';
-
-    final response = await http.get(
-      Uri.parse(
-        'https://sheets.googleapis.com/v4/spreadsheets/$spreadsheetId/values/$range',
-      ),
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-      },
-    );
-    if (response.statusCode == 200) {
-      setState(() {
-        _googleSheetData = response.body;
-        _isLoading = false;
-      });
-      // Parse the JSON string
-      Map<String, dynamic> jsonData = jsonDecode(response.body);
-
-      // Access the "values" key, which is a list of lists
-      List<dynamic> jsonValues = jsonData['values'];
-
-      // Set state to store the fetched data and stop the loading indicator
-      setState(() {
-        values = jsonValues.sublist(1); // Skip the header row
-        _isLoading = false;
-      });
-
-    } else {
-      print('Error fetching Google Sheets: ${response.statusCode} - ${response.body}');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
+    _fetchContacts();
+  }
+
+  Future<void> _fetchContacts() async {
     final authProvider = Provider.of<GAuthProvider>(context, listen: false);
-    token = authProvider.getAccessToken();
+    final token = authProvider.getAccessToken();
+
+    if (token != null && values.isEmpty) {
+      setState(() {
+        _isLoading = true;
+      });
+      final jsonValues = await authProvider.getGoogleSheetContent(token, "contacts", 'Sheet1!A2:D');
+      setState(() {
+        _isLoading = false;
+        values = jsonValues;
+      });
+    }
   }
 
   String extractFileId(String url) {
@@ -106,11 +72,6 @@ class _PhonePageState extends State<PhonePage> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<GAuthProvider>(context);
-    final token = authProvider.getAccessToken();
-
-    if (token != null) {
-      _readGoogleSheet(token);
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -137,9 +98,7 @@ class _PhonePageState extends State<PhonePage> {
             String name = values[index][0];        // Access the first column (Name)
             String relationship = values[index][1];    // Access the second column (Relationship)
             String avatarLink = values[index][2];  // Access the forth column (Avatar Link)
-            print(avatarLink);
-            // "https://drive.google.com/uc?export=view&id=$fileId";
-            //avatarLink = "https://www.w3schools.com/w3images/lights.jpg";
+            String phoneNumber = values[index][3];  // Access the third column (Phone Number) 
 
             return AbsorbPointer(
               absorbing: false,
@@ -147,7 +106,7 @@ class _PhonePageState extends State<PhonePage> {
                 behavior: HitTestBehavior.opaque,  // Ensures the entire area responds to taps
                 onTap: () {
                   print("tapped");
-                  _dialPhoneNumber('17342395118'); // Replace with actual phone number
+                  _dialPhoneNumber(phoneNumber); // Replace with actual phone number
                 },
                 child: Material(
                   type: MaterialType.transparency,  // Ensure transparency

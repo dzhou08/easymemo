@@ -7,6 +7,7 @@ import 'games_stroop_page.dart';
 import 'games_puzzle_page.dart';
 import 'games_matching_page.dart';
 import 'games_trivia_page.dart';
+import 'games_picture_recall_page.dart';
 import 'util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
@@ -237,6 +238,7 @@ class GameTile extends StatelessWidget {
   final List<String> gameTitles = [
     'Mini-Cog™ Test',
     'Trivia Game',
+    'Picture Recall',
     'SDMT Test',
     'Stroop Test',
     'Memory Match',
@@ -247,16 +249,18 @@ class GameTile extends StatelessWidget {
   final List<IconData> gameIcons = [
     Icons.medical_information,
     Icons.question_answer,
+    Icons.picture_as_pdf,
     Icons.numbers,
     Icons.color_lens,
     Icons.games,
-    Icons.image,
+    Icons.wysiwyg,
   ];
 
   // Define game routes for navigation
   final List<Widget> gameRoutes = [
     const MiniCogPage(),
     const TriviaPage(),
+    const PictureRecallPage(),
     const SDMTPage(),
     const StroopPage(),
     const MatchingPage(),
@@ -286,7 +290,7 @@ class GameTile extends StatelessWidget {
               size: 15,
               color: Colors.deepPurpleAccent,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(width: 20),
             Text(
               gameTitles[index],
               textAlign: TextAlign.center,

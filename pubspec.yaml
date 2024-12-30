@@ -49,6 +49,7 @@ dependencies:
   googleapis: ^13.2.0
   extension_google_sign_in_as_googleapis_auth: ^2.0.12
   fl_chart: ^0.70.0
+  flip_card: ^0.7.0
 
 
   english_words: ^4.0.0

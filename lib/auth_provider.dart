@@ -175,6 +175,38 @@ class GAuthProvider with ChangeNotifier {
     return httpClient;
   }
 
+    // Read Google Sheet data
+  Future<List<dynamic>> getGoogleSheetContent(String accessToken, String spreadsheetName, String range) async {
+    String? spreadsheetId = await findGoogleSheetByName(spreadsheetName);
+    if (spreadsheetId == null)
+    {
+      print('Google Sheet not found');
+      return [];
+    }
+
+    final response = await http.get(
+      Uri.parse(
+        'https://sheets.googleapis.com/v4/spreadsheets/$spreadsheetId/values/$range',
+      ),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    if (response.statusCode == 200) {
+      // Parse the JSON string
+      Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+      // Access the "values" key, which is a list of lists
+      List<dynamic> jsonValues = jsonData['values'];
+
+      return jsonValues;
+
+    } else {
+      print('Error fetching Google Sheets: ${response.statusCode} - ${response.body}');
+      return [];
+    }
+  }
+
   Future<Uint8List?> getGoogleImageFileContent(String fileUrl) async {
     String fileId = '';
 
