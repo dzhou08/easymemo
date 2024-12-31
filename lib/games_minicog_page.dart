@@ -30,7 +30,97 @@ import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart';
 import 'dart:typed_data';
 
+class CircleClockPaintContent extends PaintContent {
+  final Offset center;
+  final double radius;
+  final Paint circlePaint;
+  final Paint tickPaint;
 
+  CircleClockPaintContent({
+    required this.center,
+    required this.radius,
+    required this.circlePaint,
+    required this.tickPaint,
+  });
+
+  @override
+  void drawContent(Canvas canvas, Size size) {
+    // Draw the circle
+    canvas.drawCircle(center, radius, circlePaint);
+
+    // Draw the hour ticks
+    for (int i = 0; i < 12; i++) {
+      double angle = (i * 30) * (pi / 180);
+      double startX = center.dx + radius * 0.9 * cos(angle);
+      double startY = center.dy + radius * 0.9 * sin(angle);
+      double endX = center.dx + radius * cos(angle);
+      double endY = center.dy + radius * sin(angle);
+      canvas.drawLine(Offset(startX, startY), Offset(endX, endY), tickPaint);
+    }
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'center': {'dx': center.dx, 'dy': center.dy},
+      'radius': radius,
+      'circlePaint': {
+        'color': circlePaint.color.value,
+        'strokeWidth': circlePaint.strokeWidth,
+        'style': circlePaint.style.index,
+      },
+      'tickPaint': {
+        'color': tickPaint.color.value,
+        'strokeWidth': tickPaint.strokeWidth,
+        'style': tickPaint.style.index,
+      },
+    };
+  }
+
+  @override
+  PaintContent fromJson(Map<String, dynamic> json) {
+    return CircleClockPaintContent(
+      center: Offset(json['center']['dx'], json['center']['dy']),
+      radius: json['radius'],
+      circlePaint: Paint()
+        ..color = Color(json['circlePaint']['color'])
+        ..strokeWidth = json['circlePaint']['strokeWidth']
+        ..style = PaintingStyle.values[json['circlePaint']['style']],
+      tickPaint: Paint()
+        ..color = Color(json['tickPaint']['color'])
+        ..strokeWidth = json['tickPaint']['strokeWidth']
+        ..style = PaintingStyle.values[json['tickPaint']['style']],
+    );
+  }
+
+  @override
+  PaintContent copy() {
+    return CircleClockPaintContent(
+      center: center,
+      radius: radius,
+      circlePaint: circlePaint,
+      tickPaint: tickPaint,
+    );
+  }
+
+  @override
+  void draw(Canvas canvas, Size size, bool isFill) {
+    drawContent(canvas, size);
+  }
+
+  @override
+  void drawing(Offset endPoint) {
+    // Implement the drawing logic if needed
+  }
+
+  @override
+  void startDraw(Offset startPoint) {}
+
+  @override
+  Map<String, dynamic> toContentJson() {
+    return toJson();
+  }
+}
 
 class MiniCogPage extends StatefulWidget {
   const MiniCogPage({super.key});
@@ -67,23 +157,6 @@ class _MiniCogPageState extends State<MiniCogPage> {
   late DrawingController _drawingController;
 
   Uint8List? _imageBytes;
-
-  /*Future<void> _initializeImagePath() async {
-    final directory = await getApplicationDocumentsDirectory(); // Await the future to get the directory
-    final path = directory.path;
-
-    setState(() {
-      _imageFilePath = '$path/FlutterLetsDraw.png';
-      print("init set $_imageFilePath");
-    });
-
-    // Delete the file if it exists
-    final file = Io.File(_imageFilePath!); // Correct import prefix 'io'
-    if (await file.exists()) { // Use await for asynchronous file operations
-      await file.delete(); // Asynchronously delete the file
-      print('FlutterLetsDraw.png deleted successfully');
-    }
-  }*/
 
   Future<void> _initAsync() async {
     // Initialize the image path asynchronously
@@ -212,7 +285,7 @@ class _MiniCogPageState extends State<MiniCogPage> {
       pdf.addPage(
         pw.Page(
           build: (pw.Context context) => pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            crossAxisAlignment: pw.CrossAxisAlignment.center,
             children: [
               pw.Text('$yearDay $hourMin', style: pw.TextStyle(font: font)),
               pw.Text('Your Mini-Cog diagnose results are listed below:', style: pw.TextStyle(font: font)),
@@ -279,40 +352,32 @@ class _MiniCogPageState extends State<MiniCogPage> {
     }
   }
 
-  // Function to draw a circle
+  // Function to draw a circle as a clock with hour ticks
   void _drawCircle() {
-    // Define the circle properties
-    const Map<String, dynamic> circle = <String, dynamic>{
-      'type': 'Circle',
-      'isEllipse': false,
-      'startFromCenter': true,
-      'center': <String, dynamic>{
-        'dx': 550.0,
-        'dy': 762.0
-      },
-      'startPoint': <String, dynamic>{
-        'dx': 120.94337550070736,
-        'dy': 150.05980083656557
-      },
-      'endPoint': <String, dynamic>{
-        'dx': 440.1373386828114,
-        'dy': 477.32029957032194
-      },
-      'radius': 90.0,
-      'paint': <String, dynamic>{
-        'blendMode': 3,
-        'color': 4294198070,
-        'filterQuality': 3,
-        'invertColors': false,
-        'isAntiAlias': false,
-        'strokeCap': 1,
-        'strokeJoin': 1,
-        'strokeWidth': 4.0,
-        'style': 1
-      }
-    };
+    print("draw circle");
+    final Paint circlePaint = Paint()
+      ..color = Colors.red
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4.0;
 
-    _drawingController.addContent(Circle.fromJson(circle));
+    final Paint tickPaint = Paint()
+      ..color = Colors.red
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
+    final Offset center = Offset(200.0, 200.0);
+    final double radius = 90.0;
+
+    _drawingController.addContent(
+      CircleClockPaintContent(
+        center: center,
+        radius: radius,
+        circlePaint: circlePaint,
+        tickPaint: tickPaint,
+      ),
+    );
+
+    setState(() {}); // Trigger a rebuild to display the new content
   }
 
   final openAI = OpenAI.instance.build(
@@ -334,16 +399,19 @@ class _MiniCogPageState extends State<MiniCogPage> {
 
     String base64Image = base64Encode(_imageBytes!);
     String imageAnalysisInstruction = """
-              Help me to analyze a png image file. Does it contain a norml clock?
-              A normal clock has all numbers placed in the correct sequence and approximately correct position.
-              (e.g., 12, 3, 6 and 9 are in anchor positions) with no missing or duplicate numbers. 
-              Clock hands are pointing to the 11 and 2 (11:10).
-              It is OK if the numbers are outside the clock circle.
-              Clock hand length is not scored.
+              Help me to analyze the image file. 
+              
+              Does it contain a normal clock drawing satisfying the following criteria?
+              
+              1. All numbers from 1 to 12 should be present and in sequence.
+              2. Numbers can be outside the circle.
+              3. Anchor positions (12, 3, 6, 9) should be roughly correct.
+              4. Hands are pointing to the 11 and 2 (11:10). Hand length is not scored.
+              
               Please provide a response in plain JSON format (with no extra markdown of formatting).
               The JSON object has two attributes, in lower cases: 
               points, and feedback.
-              points = 2, when the image is of a normal clock; 0, otherwise;
+              points = 2, when the image is of a normal clock; Otherwise, points = 0;
               Give the reason of rating in the feedback attribute.
               
               Ensure the response is directly in JSON format without wrapping in backticks.
@@ -351,7 +419,7 @@ class _MiniCogPageState extends State<MiniCogPage> {
 
     final request_2 = ChatCompleteText(
       messages: [
-        Map.of({"role": "system", "content": "You are a helpful medical assistant, specialized with the Mini-Cog™ analysis associated with Alzheimer disease."}),
+        Map.of({"role": "system", "content": "You are an expert with Mini-Cog™ analysis for early detection of Alzheimer disease."}),
         Map.of({"role": "user", "content": [
               {"type": "text", 
               "text": imageAnalysisInstruction},
@@ -628,7 +696,6 @@ class _MiniCogPageState extends State<MiniCogPage> {
             steps: steps(_clockDrawingPoints, _clockDrawingFeedback),
             currentStep: currentStep,
             onStepContinue: () {
-              print("isLastStep $isLastStep");
               if (isLastStep) {
                 setState(() => isComplete = true);
               } else {
@@ -646,24 +713,22 @@ class _MiniCogPageState extends State<MiniCogPage> {
             onStepTapped: (step)  => setState(() => currentStep = step),
             controlsBuilder: (context, details) => Padding(
               padding: const EdgeInsets.only(top: 32),
-              child: Row(
-                children: [
-                  if(!isFirstStep) ...[
-                    Expanded(
-                      child:ElevatedButton(
+              child: Center(
+                child: Row(
+                  children: [
+                    if(!isFirstStep) ...[
+                      ElevatedButton(
                         onPressed: isFirstStep ? null : details.onStepCancel,
                         child: const Text('<< Back'),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                  ],
-                  Expanded(
-                    child:ElevatedButton(
+                      const SizedBox(width: 16),
+                    ],
+                    ElevatedButton(
                       onPressed: details.onStepContinue,
                       child: Text(isLastStep? 'Confirm': 'Next >>'),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -801,7 +866,7 @@ class _MiniCogPageState extends State<MiniCogPage> {
       isActive: currentStep >= 2,
       title: const Text('Repeat the words'),
       content: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               _text,

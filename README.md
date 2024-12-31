@@ -21,3 +21,7 @@ samples, guidance on mobile development, and a full API reference.
 `firebase experiments:enable webframeworks`
 `firebase deploy`
 
+## Privacy Policy
+
+You can read our privacy policy [here](privacy_policy.md).
+

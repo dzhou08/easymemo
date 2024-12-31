@@ -80,7 +80,7 @@ class _CognitiveGamesPageState extends State<CognitiveGamesPage> {
                           visible: _isExpandedVisible,
                           child: Column(
                             children: [ 
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 10),
                               // add a dropdown menu
                               DropdownButton<String>(
                                 value: _scoreGameType,
@@ -97,7 +97,7 @@ class _CognitiveGamesPageState extends State<CognitiveGamesPage> {
                                   });
                                 },
                               ),
-
+                              const SizedBox(height: 10),
                               // draw a scatter chart to show the score trend
                               // Placeholder for the chart
                               Container(
