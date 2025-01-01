@@ -22,6 +22,7 @@ import 'dart:io' as Io;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'dart:typed_data';
 
 class AskingPage extends StatefulWidget {
   const AskingPage({Key? key}) : super(key: key);
@@ -49,15 +50,16 @@ class _AskingPageState extends State<AskingPage> {
   // LabelText that will be updated
   String inputLabelText = "Enter your prompt";
 
-  Io.File? _image;
+  Uint8List? _image;
 
   // Function to pick an image
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
+      final bytes = await pickedImage.readAsBytes();
       setState(() {
-        _image = Io.File(pickedImage.path);
+        _image = bytes;
       });
     }
   }
@@ -123,22 +125,11 @@ class _AskingPageState extends State<AskingPage> {
       enableLog: true
     );
     
-    if (_image != null && (Io.Platform.isAndroid || Io.Platform.isIOS))
+    if (_image != null)
     {
       print("with picture");
       try {
-        // Step 1: compress file first
-        final compressedImage = await FlutterImageCompress.compressAndGetFile(
-          _image!.absolute.path,
-          "${_image!.path}_compressed.jpg",
-          quality: 70, // Adjust the quality (0-100) to control compression
-        );
-        if (compressedImage == null) {
-          throw Exception('Image compression failed');
-        }
-        // Step 2: Read the compressed image and encode it as a base64 string
-        final bytes = Io.File(compressedImage.path).readAsBytesSync();
-        String base64Image = base64Encode(bytes);
+        String base64Image = base64Encode(_image!);
 
         // Step 3: Construct the image analysis instruction
         String imageAnalysisInstruction = """
@@ -396,7 +387,11 @@ class _AskingPageState extends State<AskingPage> {
                     decoration: BoxDecoration(
                       border: Border.all(),
                     ),
-                    child: Image.file(_image!, fit: BoxFit.cover),
+                    child: Image.memory(
+                        _image!,
+                        //width: 200, // Set the width to 200 pixels
+                        //height: 150, // Set the height to 150 pixels
+                        fit: BoxFit.cover)
                   ),
                   // Delete button
                   Positioned(
