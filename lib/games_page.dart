@@ -241,8 +241,8 @@ class GameTile extends StatelessWidget {
     'Picture Recall',
     'SDMT Test',
     'Stroop Test',
-    'Memory Match',
     'Puzzle Game',
+    'Memory Match',
   ];
 
   // Define game icons
@@ -252,8 +252,8 @@ class GameTile extends StatelessWidget {
     Icons.picture_as_pdf,
     Icons.numbers,
     Icons.color_lens,
-    Icons.games,
     Icons.wysiwyg,
+    Icons.games,
   ];
 
   // Define game routes for navigation
@@ -263,8 +263,8 @@ class GameTile extends StatelessWidget {
     const PictureRecallPage(),
     const SDMTPage(),
     const StroopPage(),
-    const MatchingPage(),
     const PuzzlePage(),
+    const MatchingPage(),
   ];
 
   @override

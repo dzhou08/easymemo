@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'auth_provider.dart';
 import 'dart:math';
 import 'dart:typed_data';
+import 'util.dart';
 
 
 class PictureRecallPage extends StatefulWidget {
@@ -59,6 +60,9 @@ class PictureRecallPageState extends State<PictureRecallPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Picture Recall Game'),
+        actions: [
+          ProfilePopupMenu(),
+        ],
       ),
       body: Center(
         child: Column(

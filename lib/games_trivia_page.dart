@@ -4,6 +4,7 @@ import 'auth_provider.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'env_config.dart';
 import 'dart:convert';
+import 'util.dart';
 
 class TriviaQuestion {
   final String question;
@@ -135,6 +136,9 @@ class _TriviaPageState extends State<TriviaPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trivia Game'),
+        actions: [
+          ProfilePopupMenu(),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
