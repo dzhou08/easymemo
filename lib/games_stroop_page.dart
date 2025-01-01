@@ -113,7 +113,7 @@ class _StroopPageState extends State<StroopPage> {
           children: [
             // Persistent instructions
             const Text(
-              'In this test, you will be shown a word displayed in a specific color. \n Your task is to identify the color of the text, not the word itself. \nTap the button that matches the color of the word.',
+              'In this test, you will be shown a word displayed in a specific color. \n\n Your task is to identify the color of the text, not the word itself. \n\n Tap the button that matches the color of the word.',
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
             ),

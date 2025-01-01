@@ -14,14 +14,14 @@ class SDMTPage extends StatefulWidget {
 class _SDMTPageState extends State<SDMTPage> {
   final Map<String, String> symbolToDigit = {
 
-    '🍑': '0',
-    '🍎': '1',
-    '🍌': '2',
-    '🍒': '3',
-    '🍉': '4',
-    '🍓': '5',
-    '🍍': '6',
-    '🍊': '7',
+    '🍑': '1',
+    '🍎': '0',
+    '🍌': '5',
+    '🍒': '7',
+    '🍉': '3',
+    '🍓': '2',
+    '🍍': '4',
+    '🍊': '6',
     //'🍋': '8',
     //'🍒': '0',
   };
@@ -141,17 +141,13 @@ class _SDMTPageState extends State<SDMTPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Persistent instructions
             const Column(
               children: [
                 Text(
-                  'Instructions:',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'In this test, you will be shown symbols. Your task is to identify the number associated with each symbol. Tap a tile to select the number. You will have 30 seconds to complete the test.',
+                  'In this test, you will be shown symbols. \n\n Your task is to identify the number associated with each symbol. Tap a tile to select the number. \n\n You will have 30 seconds to complete the test.',
                   style: TextStyle(fontSize: 16),
                   textAlign: TextAlign.center,
                 ),

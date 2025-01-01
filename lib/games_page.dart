@@ -162,11 +162,17 @@ class _CognitiveGamesPageState extends State<CognitiveGamesPage> {
                                                   );
                                                 })
                                                 .toList(),
-                                            gridData: FlGridData(show: true),
+                                            gridData: FlGridData(
+                                              show: true,
+                                              checkToShowHorizontalLine: (value) {
+                                                return value % 1 == 0; // Only show grid lines for integer values
+                                              },
+                                            ),
                                             titlesData: FlTitlesData(
                                               leftTitles: AxisTitles(
                                                 sideTitles: SideTitles(
                                                   showTitles: true,
+                                                  interval: 1,
                                                   getTitlesWidget: (value, meta) {
                                                     return Text(
                                                       value.toInt().toString(),
