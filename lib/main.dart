@@ -302,49 +302,46 @@ class _MyHomePageState extends State<MyHomePage> {
               SafeArea(
                 child: authProvider.getGoogleUser() == null
                     ? Center(
-                        child: Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/images/EasyMemo_logo.png'),
-                              fit: BoxFit.cover,
-                              colorFilter: ColorFilter.mode(
-                                Colors.white.withOpacity(0.5),
-                                BlendMode.dstATop,
-                              ),
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(height: 200),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0), // Add padding for better spacing
-                                  alignment: Alignment.center, // Align content to the center
-                                ),
-                                onPressed: () {
-                                  authProvider.signInWithGoogle();
-                                },
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min, // Makes the button width fit the content
-                                  mainAxisAlignment: MainAxisAlignment.center, // Center-aligns the icon and text
-                                  children: [
-                                    SvgPicture.asset(
-                                      'assets/icons/google.svg', // Path to your SVG asset
-                                      width: 20.0, // Adjust the size as needed
-                                      height: 20.0,
-                                    ),
-                                    SizedBox(width: 8.0),
-                                    Text('Sign in with Google'),
-                                  ],
-                                )
-                              ),
-                            ],
+                      child: Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/images/EasyMemo_logo.png'),
+                            fit: BoxFit.contain,
+                            alignment: Alignment(0.0, -0.3), // Adjust image position
                           ),
                         ),
-                      )
+                        child: Column(
+                          children: [
+                            Spacer(flex: 3), // Pushes content down
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                                alignment: Alignment.center,
+                              ),
+                              onPressed: () {
+                                authProvider.signInWithGoogle();
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/google.svg',
+                                    width: 20.0,
+                                    height: 20.0,
+                                  ),
+                                  SizedBox(width: 8.0),
+                                  Text('Sign in with Google'),
+                                ],
+                              )
+                            ),
+                            Spacer(flex: 2), // Adds space below button
+                          ],
+                        ),
+                      ),
+                    )
                       : 
                       Row(
                         children: [
